@@ -12,6 +12,8 @@ import com.drive.driveai.user.dto.RegisterRequest;
 import com.drive.driveai.user.dto.RegisterResponse;
 import com.drive.driveai.user.service.UserService;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/api/v1/users")
 public class UserController {
@@ -24,7 +26,7 @@ public class UserController {
 
     @PostMapping("/register")
 
-    ResponseEntity<RegisterResponse> registerUser(@RequestBody RegisterRequest request) {
+    ResponseEntity<RegisterResponse> registerUser(@Valid @RequestBody RegisterRequest request) {
         // Implementation for user registration
         RegisterResponse response = userService.registerUser(request);
         return ResponseEntity

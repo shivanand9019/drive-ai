@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.drive.driveai.exception.EmailAlreadyExistsException;
 import com.drive.driveai.user.dto.RegisterRequest;
 import com.drive.driveai.user.dto.RegisterResponse;
 import com.drive.driveai.user.entity.User;
@@ -38,7 +39,7 @@ public class UserService {
         // check exists
         String email = request.getEmail().trim().toLowerCase();
         if(userRepository.existsByEmail(email)){
-           throw new RuntimeException("User Already Exists");
+           throw new EmailAlreadyExistsException("Email Already Exists");
         }
         User user = userMapper.mapToEntity(request);
         
