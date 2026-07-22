@@ -66,7 +66,24 @@ public class GlobalExceptionHandler {
 
             return ResponseEntity   
                     .status(HttpStatus.CONFLICT)
+                 
                     .body(response);
+        }
+
+        @ExceptionHandler(InvalidCredentialsException.class)
+        public ResponseEntity<ErrorResponse> handleInvalidCredentialsException(InvalidCredentialsException ex,HttpServletRequest request){
+            ErrorResponse response =  ErrorResponse.builder()
+                                .timestamp(LocalDateTime.now())
+                                .status(HttpStatus.BAD_REQUEST.value())
+                                .error("Invalid Credentials")
+                                .message(ex.getMessage())
+                                .path(request.getRequestURI())
+                                .errors(Collections.emptyMap())
+                                .build();
+
+            return ResponseEntity
+                                .status(HttpStatus.BAD_REQUEST)
+                                .body(response);
         }
                         
 }
