@@ -8,9 +8,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.drive.driveai.user.dto.LoginRequest;
+import com.drive.driveai.user.dto.LoginResponse;
 import com.drive.driveai.user.dto.RegisterRequest;
 import com.drive.driveai.user.dto.RegisterResponse;
 import com.drive.driveai.user.service.UserService;
+
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -24,13 +28,22 @@ public class UserController {
 
     @PostMapping("/register")
 
-    ResponseEntity<RegisterResponse> registerUser(@RequestBody RegisterRequest request) {
+    ResponseEntity<RegisterResponse> registerUser(@Valid @RequestBody RegisterRequest request) {
         // Implementation for user registration
         RegisterResponse response = userService.registerUser(request);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(response);
                 
+    }
+
+    @PostMapping("/login")
+    ResponseEntity<LoginResponse> loginUser(@Valid @RequestBody LoginRequest request){
+        LoginResponse response = userService.loginUser(request);
+        return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .body(response);
+        
     }
 }
 
