@@ -11,6 +11,8 @@ import com.drive.driveai.exception.EmailAlreadyExistsException;
 import com.drive.driveai.exception.InvalidCredentialsException;
 import com.drive.driveai.user.dto.LoginRequest;
 import com.drive.driveai.user.dto.LoginResponse;
+// import com.drive.driveai.user.dto.LoginRequest;
+// import com.drive.driveai.user.dto.LoginResponse;
 import com.drive.driveai.user.dto.RegisterRequest;
 import com.drive.driveai.user.dto.RegisterResponse;
 import com.drive.driveai.user.entity.User;
@@ -45,7 +47,7 @@ public class UserService {
 
         // check email exists
         String email = request.getEmail().trim().toLowerCase();
-        if(userRepository.existsByEmail(email)){
+        if(userRepository.existsByEmailAndDeletedAtIsNull(email)){
            throw new EmailAlreadyExistsException("Email Already Exists");
         }
         User user = userMapper.mapToEntity(request);
@@ -79,11 +81,19 @@ public class UserService {
 
     public LoginResponse loginUser(LoginRequest request) {
         User user = userRepository.
-                        findByEmail(request.getEmail())
+                        findByEmailAndDeletedAtIsNull(request.getEmail())
                         .orElseThrow(() -> 
                         new InvalidCredentialsException("Invalid email or password"));
         if(!passwordEncoder.matches(request.getPassword(), user.getPasswordHash())){
             throw new InvalidCredentialsException("Invalid email or password");
         }
+        LoginResponse response = new LoginResponse();
+        return response;
+
+
+
+        
+        
     }
 }
+
