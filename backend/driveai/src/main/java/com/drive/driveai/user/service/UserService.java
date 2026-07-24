@@ -1,11 +1,18 @@
 package com.drive.driveai.user.service;
 
+import java.nio.file.OpenOption;
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.drive.driveai.exception.EmailAlreadyExistsException;
+import com.drive.driveai.exception.InvalidCredentialsException;
+import com.drive.driveai.user.dto.LoginRequest;
+import com.drive.driveai.user.dto.LoginResponse;
+// import com.drive.driveai.user.dto.LoginRequest;
+// import com.drive.driveai.user.dto.LoginResponse;
 import com.drive.driveai.user.dto.RegisterRequest;
 import com.drive.driveai.user.dto.RegisterResponse;
 import com.drive.driveai.user.entity.User;
@@ -13,6 +20,8 @@ import com.drive.driveai.user.enums.AccountStatus;
 import com.drive.driveai.user.enums.Role;
 import com.drive.driveai.user.mapper.UserMapper;
 import com.drive.driveai.user.repository.UserRepository;
+
+import jakarta.validation.Valid;
 
 @Service
 public class UserService {
@@ -36,9 +45,9 @@ public class UserService {
 
     public RegisterResponse registerUser(RegisterRequest request) {
 
-        // check exists
+        // check email exists
         String email = request.getEmail().trim().toLowerCase();
-        if(userRepository.existsByEmail(email)){
+        if(userRepository.existsByEmailAndDeletedAtIsNull(email)){
            throw new EmailAlreadyExistsException("Email Already Exists");
         }
         User user = userMapper.mapToEntity(request);
@@ -65,5 +74,26 @@ public class UserService {
         return response;
        
     }
-    
+
+
+
+
+
+    public LoginResponse loginUser(LoginRequest request) {
+        User user = userRepository.
+                        findByEmailAndDeletedAtIsNull(request.getEmail())
+                        .orElseThrow(() -> 
+                        new InvalidCredentialsException("Invalid email or password"));
+        if(!passwordEncoder.matches(request.getPassword(), user.getPasswordHash())){
+            throw new InvalidCredentialsException("Invalid email or password");
+        }
+        LoginResponse response = new LoginResponse();
+        return response;
+
+
+
+        
+        
+    }
 }
+
