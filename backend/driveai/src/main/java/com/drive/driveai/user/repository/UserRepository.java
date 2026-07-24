@@ -6,8 +6,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import com.drive.driveai.user.entity.User;
 public interface UserRepository extends JpaRepository<User, UUID> {
 
-    Optional<User> findByEmail(String email);
+    Optional<User> findByEmailAndDeletedAtIsNull(String email);
    
-    boolean existsByEmail(String email);
+    boolean existsByEmailAndDeletedAtIsNull(String email);
 
 }

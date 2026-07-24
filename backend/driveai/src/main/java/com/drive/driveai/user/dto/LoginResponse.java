@@ -1,12 +1,10 @@
 package com.drive.driveai.user.dto;
 
-import java.util.UUID;
+
 
 import lombok.Data;
 
 @Data
 public class LoginResponse {
-    private UUID userId;
-    private String fullName;
-    private String email;
+    private String token;
 }
