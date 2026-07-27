@@ -2,7 +2,9 @@ package com.drive.driveai.security;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 
+import javax.management.relation.Role;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -20,7 +22,7 @@ public class CustomUserDetails implements UserDetails{
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-       return List.of( new SimpleGrantedAuthority("ROLE_" + user.getRole().name()));
+       return List.of( new SimpleGrantedAuthority("ROLE_" + user.getRole()));
     }
 
     @Override
@@ -55,5 +57,16 @@ public class CustomUserDetails implements UserDetails{
     public User getUser(){
         return user;
     }
-    
+    public UUID getId(){
+        return user.getId();
+    }
+    public String getFullName(){
+        return user.getFullName();
+    }
+    public String getEMail(){
+        return user.getEmail();
+    }
+    public Role getRole(){
+        return  (Role) user.getRole();
+    }
 }
