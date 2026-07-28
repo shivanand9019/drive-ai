@@ -2,6 +2,7 @@ package com.drive.driveai.user.mapper;
 
 import org.springframework.stereotype.Component;
 
+import com.drive.driveai.user.dto.CurrentUserResponse;
 import com.drive.driveai.user.dto.RegisterRequest;
 import com.drive.driveai.user.dto.RegisterResponse;
 import com.drive.driveai.user.entity.User;
@@ -25,4 +26,12 @@ public class UserMapper {
             return response;
         }
 
+        public CurrentUserResponse mapToCurrentUserResponse(User user){
+            CurrentUserResponse response =  new CurrentUserResponse();
+                            response.setId(user.getId());
+                            response.setFullName(user.getFullName());
+                            response.setEmail(user.getEmail());
+                            response.setRole(user.getRole());
+            return response;
+        }
 }
