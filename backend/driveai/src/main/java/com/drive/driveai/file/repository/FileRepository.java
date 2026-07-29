@@ -1,0 +1,16 @@
+package com.drive.driveai.file.repository;
+
+import java.util.UUID;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import com.drive.driveai.file.entity.FileMetadata;
+
+@Repository
+public interface FileRepository extends JpaRepository<FileMetadata,UUID>{
+
+    
+
+    
+}
