@@ -103,6 +103,20 @@ public class GlobalExceptionHandler {
                             .status(HttpStatus.UNAUTHORIZED)
                             .body(response);
         }
+
+        @ExceptionHandler(UserNotFoundException.class)
+        public ResponseEntity<ErrorResponse> handleUserNotFoundException(UserNotFoundException ex,HttpServletRequest request){
+            ErrorResponse response = ErrorResponse.builder()
+                                     .timestamp(LocalDateTime.now())
+                                     .status(HttpStatus.NOT_FOUND.value())
+                                     .error("User not found")
+                                     .message(ex.getMessage())
+                                     .path(request.getRequestURI())
+                                     .errors(Collections.emptyMap())
+                                     .build();
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                            .body(response);
+        }
     
 
         @ExceptionHandler(InvalidFileException.class)
