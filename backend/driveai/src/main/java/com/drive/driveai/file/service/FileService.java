@@ -23,10 +23,10 @@ import io.minio.MakeBucketArgs;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
 
-import lombok.RequiredArgsConstructor;
+
 
 @Service
-@RequiredArgsConstructor
+
 public class FileService {
 
     private final MinioClient minioClient;
@@ -34,8 +34,14 @@ public class FileService {
     private FileMapper mapper;
 
     private FileRepository fileRepository;
+    public FileService(MinioClient minioClient, UserRepository userRepository, FileMapper mapper, FileRepository fileRepository) {
+        this.minioClient = minioClient;
+        this.userRepository = userRepository;
+        this.mapper = mapper;
+        this.fileRepository = fileRepository;
+    }
 
-    @Value("${app.file.max}")
+    @Value("${app.file.max-size}")
     private long maxFileSize;
     @Value("${minio.bucket}")
     private String bucket;

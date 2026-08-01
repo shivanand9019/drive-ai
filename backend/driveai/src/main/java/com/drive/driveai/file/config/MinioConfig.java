@@ -13,10 +13,10 @@ public class MinioConfig {
    @Value("${minio.endpoint}")
     private String endpoint;
 
-    @Value("${minio.access-Key}")
+    @Value("${minio.access-key}")
     private String accessKey;
     
-    @Value("${minio.secret-Key}")
+    @Value("${minio.secret-key}")
     private String secretKey;
 
     @Value("${minio.bucket}")
