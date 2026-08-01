@@ -2,13 +2,14 @@ package com.drive.driveai.file.controller;
 
 import java.util.UUID;
 
+import com.drive.driveai.file.dto.DownloadFileResponse;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.drive.driveai.file.dto.UploadFileResponse;
@@ -39,6 +40,18 @@ public class FileController {
                                 .body(response);
 
 
+    }
+    @GetMapping("/{fileId}")
+    public ResponseEntity<InputStreamResource> downloadFile(@PathVariable UUID fileId,Authentication authentication){
+        CustomUserDetails user = (CustomUserDetails) authentication.getPrincipal();
+        UUID userId = user != null ? user.getUser().getId() : null;
+        DownloadFileResponse response = fileService.downloadFile(fileId,userId);
+        InputStreamResource resource  = new InputStreamResource(response.getInputStream());
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(response.getContentType()))
+                .header(HttpHeaders.CONTENT_DISPOSITION,"attachment; filename=\""+response.getOriginalFileName()+"\"")
+                .body(resource);
     }
     
 }

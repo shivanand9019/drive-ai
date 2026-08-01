@@ -1,5 +1,6 @@
 package com.drive.driveai.file.repository;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -10,7 +11,7 @@ import com.drive.driveai.file.entity.FileMetadata;
 @Repository
 public interface FileRepository extends JpaRepository<FileMetadata,UUID>{
 
-    
+    Optional<FileMetadata> findByIdAndDeletedAtIsNull(UUID fileId);
 
     
 }

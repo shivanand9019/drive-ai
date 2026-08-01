@@ -4,7 +4,11 @@ import java.io.InputStream;
 import java.util.Set;
 import java.util.UUID;
 
+import com.drive.driveai.exception.FileMetadataNotFoundException;
+import com.drive.driveai.file.dto.DownloadFileResponse;
+import io.minio.*;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -18,22 +22,16 @@ import com.drive.driveai.file.repository.FileRepository;
 import com.drive.driveai.user.entity.User;
 import com.drive.driveai.user.repository.UserRepository;
 
-import io.minio.BucketExistsArgs;
-import io.minio.MakeBucketArgs;
-import io.minio.MinioClient;
-import io.minio.PutObjectArgs;
-
-
 
 @Service
 
 public class FileService {
 
     private final MinioClient minioClient;
-    private UserRepository userRepository;
-    private FileMapper mapper;
+    private final UserRepository userRepository;
+    private final FileMapper mapper;
 
-    private FileRepository fileRepository;
+    private final FileRepository fileRepository;
     public FileService(MinioClient minioClient, UserRepository userRepository, FileMapper mapper, FileRepository fileRepository) {
         this.minioClient = minioClient;
         this.userRepository = userRepository;
@@ -161,4 +159,32 @@ public class FileService {
                 .orElseThrow(() -> new UsernameNotFoundException("User Not found"));
         return user;
     }
+
+    public DownloadFileResponse downloadFile(UUID fileId,UUID currentUserId){
+        FileMetadata fileMetadata = fileRepository
+                .findByIdAndDeletedAtIsNull(fileId)
+                .orElseThrow(()-> new FileMetadataNotFoundException("File Not Found with id:"+fileId));
+
+        if(!(fileMetadata.getUploadedBy().getId().equals(currentUserId))){
+            throw new AccessDeniedException("You are not authorized to access this file");
+
+        }
+
+        try {
+            InputStream inputStream= minioClient.getObject(
+                    GetObjectArgs.builder()
+                            .bucket(bucket)
+                            .object(fileMetadata.getStorageKey())
+                            .build()
+            );
+            return mapper.mapToDownloadFileResponse(inputStream,fileMetadata.getOriginalFileName(),fileMetadata.getContentType());
+        } catch (Exception e) {
+            throw  new FileStorageException("Unable to download file from MinIO.",e);
+        }
+
+
+
+    }
+
+
 }

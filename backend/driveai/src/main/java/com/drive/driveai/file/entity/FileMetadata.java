@@ -6,7 +6,6 @@ import java.util.UUID;
 import com.drive.driveai.file.enums.FileStatus;
 import com.drive.driveai.user.entity.User;
 
-import jakarta.annotation.Generated;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
