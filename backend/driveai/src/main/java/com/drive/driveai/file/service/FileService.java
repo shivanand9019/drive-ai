@@ -7,6 +7,7 @@ import java.util.UUID;
 import com.drive.driveai.exception.FileMetadataNotFoundException;
 import com.drive.driveai.file.dto.DownloadFileResponse;
 import io.minio.*;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -186,5 +187,26 @@ public class FileService {
 
     }
 
+    @Transactional
+    public void deleteFile(UUID fileId, UUID currentUserId) {
 
+        FileMetadata metadata = fileRepository.findByIdAndDeletedAtIsNull(fileId)
+                .orElseThrow(()-> new FileMetadataNotFoundException("File not found"));
+
+        if(!metadata.getUploadedBy().getId().equals(currentUserId)){
+            throw  new AccessDeniedException("You are not authorized to access this file");
+        }
+        try {
+            minioClient.removeObject(
+
+                    RemoveObjectArgs.builder()
+                            .bucket(bucket)
+                            .object(metadata.getStorageKey())
+                            .build());
+        } catch (Exception e){
+            throw new FileStorageException("Error while deleting file",e);
+        }
+        metadata.markAsDeleted();
+        fileRepository.save(metadata);
+    }
 }

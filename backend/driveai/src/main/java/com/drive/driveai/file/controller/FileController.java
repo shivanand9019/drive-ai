@@ -1,5 +1,6 @@
 package com.drive.driveai.file.controller;
 
+import java.util.Objects;
 import java.util.UUID;
 
 import com.drive.driveai.file.dto.DownloadFileResponse;
@@ -52,6 +53,16 @@ public class FileController {
                 .contentType(MediaType.parseMediaType(response.getContentType()))
                 .header(HttpHeaders.CONTENT_DISPOSITION,"attachment; filename=\""+response.getOriginalFileName()+"\"")
                 .body(resource);
+    }
+
+
+    @DeleteMapping("/{fileId}")
+    public ResponseEntity<Void> deleteFile(@PathVariable UUID fileId,Authentication authentication){
+        CustomUserDetails user = (CustomUserDetails) authentication.getPrincipal();
+
+        fileService.deleteFile(fileId,user.getUser().getId());
+        return  ResponseEntity.noContent().build();
+
     }
     
 }
