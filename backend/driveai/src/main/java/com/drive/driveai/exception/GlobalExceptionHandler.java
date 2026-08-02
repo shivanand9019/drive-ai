@@ -118,5 +118,42 @@ public class GlobalExceptionHandler {
                             .body(response);
         }
     
+
+        @ExceptionHandler(InvalidFileException.class)
+        public ResponseEntity<ErrorResponse> handleInvalidFileException(InvalidFileException ex,HttpServletRequest request){
+            ErrorResponse response = ErrorResponse.builder()
+                                                  .timestamp(LocalDateTime.now())
+                                                  .status(HttpStatus.BAD_REQUEST.value())
+                                                  .error("Bad Request")
+                                                  .message(ex.getMessage())
+                                                  .path(request.getRequestURI())
+                                                  .errors(Collections.emptyMap())
+                                                  .build();
+            return ResponseEntity
+                                .status(HttpStatus.BAD_REQUEST)
+                       
+                                .body(response);
+        }
+
+        @ExceptionHandler(FileStorageException.class)
+        public ResponseEntity<String> handleFileStorageException(FileStorageException ex,Exception e){
+        String response = ex.getMessage() + e;
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                                .body(response);
+        }
+
+        @ExceptionHandler(FileMetadataNotFoundException.class)
+        public ResponseEntity<ErrorResponse> handleFileNotFoundException(FileMetadataNotFoundException ex, HttpServletRequest request){
+        ErrorResponse response =  ErrorResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.NOT_FOUND.value())
+                .error("Invalid fileId")
+                .message(ex.getMessage())
+                .path(request.getRequestURI())
+                .errors(Collections.emptyMap())
+                .build();
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(response);
+        }
                         
 }

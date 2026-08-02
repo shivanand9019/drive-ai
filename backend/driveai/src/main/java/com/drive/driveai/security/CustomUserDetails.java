@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
-import javax.management.relation.Role;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -12,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import com.drive.driveai.user.entity.User;
 import com.drive.driveai.user.enums.AccountStatus;
+import com.drive.driveai.user.enums.Role;
 
 public class CustomUserDetails implements UserDetails{
 
@@ -67,6 +67,6 @@ public class CustomUserDetails implements UserDetails{
         return user.getEmail();
     }
     public Role getRole(){
-        return  (Role) user.getRole();
+        return  user.getRole();
     }
 }
