@@ -1,6 +1,8 @@
 package com.drive.driveai.file.mapper;
 
 import com.drive.driveai.file.dto.DownloadFileResponse;
+import com.drive.driveai.file.dto.FileResponse;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 
@@ -47,5 +49,14 @@ public class FileMapper {
         return downloadFileResponse;
 
 
+    }
+    public FileResponse mapToFileResponse(FileMetadata metadata){
+        FileResponse response = new FileResponse();
+        response.setId(metadata.getId());
+        response.setOriginalFileName(metadata.getOriginalFileName());
+        response.setFileSize(metadata.getFileSize());
+        response.setContentType(metadata.getContentType());
+        response.setStatus(metadata.getStatus());
+        return response;
     }
 }

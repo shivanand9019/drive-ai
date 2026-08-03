@@ -4,7 +4,13 @@ import java.util.Objects;
 import java.util.UUID;
 
 import com.drive.driveai.file.dto.DownloadFileResponse;
+import com.drive.driveai.file.dto.FileResponse;
+import com.drive.driveai.file.dto.RenameFileRequest;
+import jakarta.validation.Valid;
+import lombok.Value;
 import org.springframework.core.io.InputStreamResource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -63,6 +69,24 @@ public class FileController {
         fileService.deleteFile(fileId,user.getUser().getId());
         return  ResponseEntity.noContent().build();
 
+    }
+
+    @GetMapping
+    public ResponseEntity<Page<FileResponse>> getMyFiles(Pageable pageable,Authentication authentication){
+        CustomUserDetails user = (CustomUserDetails)  authentication.getPrincipal();
+        UUID currentUserId = user.getUser().getId();
+        Page<FileResponse> response = fileService.getMyFiles(currentUserId,pageable);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(response);
+    }
+    @PatchMapping("/{fileId}/rename")
+    public ResponseEntity<FileResponse> renameFile(@PathVariable UUID fileId,@Valid @RequestBody RenameFileRequest request, Authentication authentication){
+        CustomUserDetails user = (CustomUserDetails) authentication.getPrincipal();
+        UUID currentUserId = user.getUser().getId();
+
+        FileResponse response = fileService.renameFile(fileId,currentUserId,request);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(response);
     }
     
 }

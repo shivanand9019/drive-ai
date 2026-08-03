@@ -3,6 +3,8 @@ package com.drive.driveai.file.repository;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -12,6 +14,6 @@ import com.drive.driveai.file.entity.FileMetadata;
 public interface FileRepository extends JpaRepository<FileMetadata,UUID>{
 
     Optional<FileMetadata> findByIdAndDeletedAtIsNull(UUID fileId);
-
+    Page<FileMetadata> findByUploadedByIdAndDeletedAtIsNull(UUID userId, Pageable pageable);
     
 }
