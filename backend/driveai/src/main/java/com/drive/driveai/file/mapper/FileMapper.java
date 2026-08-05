@@ -1,6 +1,7 @@
 package com.drive.driveai.file.mapper;
 
 import com.drive.driveai.file.dto.DownloadFileResponse;
+import com.drive.driveai.file.dto.FileResponse;
 import org.springframework.stereotype.Component;
 
 
@@ -8,6 +9,7 @@ import com.drive.driveai.file.dto.UploadFileResponse;
 import com.drive.driveai.file.entity.FileMetadata;
 import com.drive.driveai.file.enums.FileStatus;
 import com.drive.driveai.user.entity.User;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.InputStream;
 
@@ -47,5 +49,18 @@ public class FileMapper {
         return downloadFileResponse;
 
 
+    }
+    public FileResponse toResponse(FileMetadata file) {
+
+        FileResponse response = new FileResponse();
+
+        response.setId(file.getId());
+        response.setOriginalFileName(file.getOriginalFileName());
+        response.setContentType(file.getContentType());
+        response.setFileSize(file.getFileSize());
+        response.setStatus(file.getStatus());
+        response.setCreatedAt(file.getCreatedAt());
+
+        return response;
     }
 }
