@@ -1,0 +1,30 @@
+* [33m88527b8[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mdevelop[m[33m)[m feat: add login,register page with authentication
+*   [33mae084db[m Merge pull request #16 from shivanand9019/feature/file-download
+[32m|[m[33m\[m  
+[32m|[m [33m|[m * [33mc0bb9df[m[33m ([m[1;31morigin/feature/file-module[m[33m, [m[1;32mfeature/file-module[m[33m)[m feat: implement file rename with Bean Validation
+[32m|[m [33m|[m [34m|[m *   [33m5effed0[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m Merge pull request #17 from shivanand9019/feature/file-module
+[32m|[m [33m|[m [34m|[m [35m|[m[34m\[m  
+[32m|[m [33m|[m [34m|[m [35m|[m[34m/[m  
+[32m|[m [33m|[m [34m|[m[34m/[m[35m|[m   
+[32m|[m [33m|[m * [35m|[m [33m3545b0a[m feat:implement soft delete
+[32m|[m [33m|[m[33m/[m [35m/[m  
+[32m|[m * [35m|[m [33me990635[m[33m ([m[1;31morigin/feature/file-download[m[33m)[m chore: stop tracking application.properties
+[32m|[m * [35m|[m [33m98327d6[m feat: implement file download with MinIO streaming
+[32m|[m[32m/[m [35m/[m  
+* [35m|[m   [33mf18a509[m fix : merge conflict from feature/file-module
+[1;31m|[m[1;32m\[m [35m\[m  
+[1;31m|[m * [35m\[m   [33m4adfe9a[m Merge pull request #15 from shivanand9019/feature/file-module
+[1;31m|[m [1;33m|[m[1;34m\[m [35m\[m  
+* [1;33m|[m [1;34m\[m [35m\[m   [33meb8f8e5[m fix: merge conflict
+[1;35m|[m[1;36m\[m [1;33m\[m [1;34m\[m [35m\[m  
+[1;35m|[m * [1;33m|[m [1;34m|[m [35m|[m [33m8e12536[m feat: implement file upload with MinIO and metadata persistence
+[1;35m|[m [1;34m|[m [1;33m|[m[1;34m/[m [35m/[m  
+[1;35m|[m [1;34m|[m[1;34m/[m[1;33m|[m [35m|[m   
+[1;35m|[m * [1;33m|[m [35m|[m [33mce69d1f[m Merge branch 'develop' into feature/file-module
+[1;35m|[m [31m|[m[1;33m\[m[1;33m|[m [35m|[m 
+[1;35m|[m * [1;33m|[m [35m|[m [33me513b52[m feat: add file upload functionality using MinIO
+* [32m|[m [1;33m|[m [35m|[m [33m8ca50ba[m fix: role enum access fix
+[32m|[m [32m|[m [1;33m|[m *   [33m90e694a[m Merge pull request #14 from shivanand9019/develop
+[32m|[m [32m|[m [1;33m|[m [33m|[m[1;33m\[m  
+[32m|[m [32m|[m [1;33m|[m [33m|[m[1;33m/[m  
+[32m|[m [32m|[m [1;33m|[m[1;33m/[m[33m|[m   

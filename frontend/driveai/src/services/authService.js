@@ -26,10 +26,12 @@ const  register = async (registerRequest) => {
 
 }
 
-export function logout() {
-  // TODO: POST /api/auth/logout (invalidate refresh token server-side)
-  localStorage.removeItem(STORAGE_KEY);
-}
+
+  const logout = () => {
+    localStorage.removeItem("token");
+
+  };
+
 
 
 export const authService = {
