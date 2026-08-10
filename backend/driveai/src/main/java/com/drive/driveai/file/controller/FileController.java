@@ -60,7 +60,6 @@ public class FileController {
                 .header(HttpHeaders.CONTENT_DISPOSITION,"attachment; filename=\""+response.getOriginalFileName()+"\"")
                 .body(resource);
     }
-<<<<<<< Updated upstream
 
 
     @DeleteMapping("/{fileId}")
@@ -89,8 +88,7 @@ public class FileController {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(response);
     }
-=======
->>>>>>> Stashed changes
+
     
     @GetMapping()
     public ResponseEntity<?> getAllFiles(Authentication authentication){
