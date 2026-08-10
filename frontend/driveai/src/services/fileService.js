@@ -8,7 +8,7 @@ export async function getFiles() {
   // Backend list files endpoint is not implemented yet.
   const response = await api.get("/files");
 
-  return response.data;
+  return response.data.content;
 }
 
 export async function uploadFile(file) {
@@ -37,16 +37,24 @@ export async function downloadFile(fileId) {
   }
 }
 
-export async function renameFile(fileId, newName) {
-  // Backend rename endpoint is not implemented yet.
-  await new Promise((r) => setTimeout(r, 300));
-  return { ok: true };
+export async function renameFile(fileId, fileName) {
+ try{
+   const response = await api.patch(`/files/${fileId}/rename`,
+       {fileName,});
+   return response.data;
+ }catch (error){
+   console.error(error);
+   throw  error;
+ }
 }
 
 export async function deleteFile(fileId) {
-  // Backend delete endpoint is not implemented yet.
-  await new Promise((r) => setTimeout(r, 300));
-  return { ok: true };
+  try{
+    await  api.delete(`/files/${fileId}`);
+  } catch (error){
+    console.error(error);
+    throw  error;
+  }
 }
 
 export async function shareFile(fileId, email) {

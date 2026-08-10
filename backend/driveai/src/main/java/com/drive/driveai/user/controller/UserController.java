@@ -21,7 +21,7 @@ import com.drive.driveai.security.CustomUserDetails;
 import com.drive.driveai.user.dto.CurrentUserResponse;
 import com.drive.driveai.user.service.UserService;
 @RestController
-@RequestMapping("/api/v1/users")
+@RequestMapping("/users")
 public class UserController {
     
     private final UserService userService;

@@ -17,11 +17,11 @@ import com.drive.driveai.user.entity.User;
 public interface FileRepository extends JpaRepository<FileMetadata,UUID>{
 
     Optional<FileMetadata> findByIdAndDeletedAtIsNull(UUID fileId);
-<<<<<<< Updated upstream
+
     Page<FileMetadata> findByUploadedByIdAndDeletedAtIsNull(UUID userId, Pageable pageable);
-=======
+
     List<FileMetadata> findByUploadedByAndDeletedAtIsNull(User user );
 
->>>>>>> Stashed changes
+
     
 }

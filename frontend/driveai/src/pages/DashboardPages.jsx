@@ -51,10 +51,38 @@ export function MyFiles() {
       } catch (error) {
         console.error('File download failed', error);
       }
-      return;
+
+    }console.log(action, file); // TODO: Rename/Share/View API not implemented in backend yet
+    if( action === 'rename') {
+      const fileName = window.prompt(
+          "Enter new file name:",
+          file.originalFileName
+      );
+
+      if (!fileName || fileName === file.originalFileName) {
+        return;
+      }
+
+      try {
+        const updatedFile = await fileService.renameFile(
+            file.id,
+            fileName
+        );
+
+        setFiles((prev) =>
+            prev.map((item) =>
+                item.id === file.id
+                    ? updatedFile
+                    : item
+            )
+        );
+      } catch (error) {
+        console.error(error);
+      }
+
+
     }
 
-    console.log(action, file); // TODO: Rename/Share/View API not implemented in backend yet
   };
 
   return (
@@ -86,7 +114,7 @@ export function MyFiles() {
       <ConfirmDialog
         open={!!confirmDelete}
         title="Delete this file?"
-        message={`"${confirmDelete?.name}" will be moved to trash.`}
+        message={`"${confirmDelete?.originalFileName}" will be moved to trash.`}
         confirmLabel="Delete"
         onConfirm={async () => { await fileService.deleteFile(confirmDelete.id); setConfirmDelete(null); }}
         onCancel={() => setConfirmDelete(null)}

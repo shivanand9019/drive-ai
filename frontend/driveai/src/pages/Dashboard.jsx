@@ -54,15 +54,50 @@ export default function Dashboard() {
     loadFiles();
   }, []);
 
-  const handleAction = (action, file) => {
+  const handleAction = async (action, file) => {
     switch (action) {
       case "download":
-        console.log("Download", file);
+        try {
+          const blob = await fileService.downloadFile(file.id);
+          const url = window.URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = file.originalFileName;
+          document.body.appendChild(link);
+          link.click();
+          link.remove();
+          window.URL.revokeObjectURL(url);
+        } catch (error) {
+          console.error('File download failed', error);
+        }
         break;
+      case "rename": {
+        const newName = window.prompt(
+            "Enter new file name:",
+            file.originalFileName
+        );
 
-      case "rename":
-        console.log("Rename", file);
-        break;
+        if (!newName || newName === file.originalFileName) {
+          return;
+        }
+
+        try {
+          const updatedFile = await fileService.renameFile(
+              file.id,
+              newName
+          );
+
+          setFiles((prev) =>
+              prev.map((item) =>
+                  item.id === file.id
+                      ? updatedFile
+                      : item
+              )
+          );
+        } catch (error) {
+          console.error(error);
+        }
+        break;}
 
       case "delete":
         setConfirmDelete(file);
@@ -77,7 +112,7 @@ export default function Dashboard() {
     if (!confirmDelete) return;
 
     try {
-      await fileService.deleteFile(confirmDelete.id);
+      await fileService.deleteFile(confirmDelete.fileId);
 
       setFiles((prev) =>
           prev.filter((file) => file.id !== confirmDelete.id)

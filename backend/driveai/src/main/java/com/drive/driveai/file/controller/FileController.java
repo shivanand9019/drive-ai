@@ -29,6 +29,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/v1/files")
 @RequiredArgsConstructor
+@CrossOrigin("http://localhost:5173/*")
 public class FileController {
 
     private final FileService fileService;
@@ -90,10 +91,10 @@ public class FileController {
     }
 
     
-    @GetMapping()
-    public ResponseEntity<?> getAllFiles(Authentication authentication){
-        CustomUserDetails user = (CustomUserDetails) authentication.getPrincipal();
-        UUID userId = user != null ? user.getUser().getId() : null;
-        return ResponseEntity.ok(fileService.getAllFiles(userId));
-    }    
+//    @GetMapping()
+//    public ResponseEntity<Page<FileResponse>> getMyFiles(Authentication authentication,Pageable pageable){
+//        CustomUserDetails user = (CustomUserDetails) authentication.getPrincipal();
+//        UUID userId = user != null ? user.getUser().getId() : null;
+//        return ResponseEntity.ok(fileService.getMyFiles(userId,pageable));
+//    }
 }

@@ -51,7 +51,15 @@ public class FileMapper {
     }
 
     public FileResponse mapToFileResponse(FileMetadata metadata) {
-        FileResponse f = new FileResponse();
-        return f;
+       FileResponse response = new FileResponse();
+       response.setId(metadata.getId());
+        response.setOriginalFileName(metadata.getOriginalFileName());
+       response.setFileSize(metadata.getFileSize());
+       response.setContentType(metadata.getContentType());
+       response.setStatus(metadata.getStatus());
+       response.setUploadedAt(metadata.getCreatedAt());
+       return response;
+
+
     }
 }

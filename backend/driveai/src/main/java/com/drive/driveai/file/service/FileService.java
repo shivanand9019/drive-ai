@@ -167,6 +167,7 @@ public class FileService {
         return user;
     }
 
+    // download file
     public DownloadFileResponse downloadFile(UUID fileId,UUID currentUserId){
         FileMetadata fileMetadata = fileRepository
                 .findByIdAndDeletedAtIsNull(fileId)
@@ -193,7 +194,7 @@ public class FileService {
 
     }
 
-
+    // delete file
     @Transactional
     public void deleteFile(UUID fileId, UUID currentUserId) {
 
@@ -250,20 +251,14 @@ public class FileService {
         metadata= fileRepository.save(metadata);
         return mapper.mapToFileResponse(metadata);
     }
-    private String getExtension(String fileName){
+    private String getExtension(String fileName) {
         int index = fileName.lastIndexOf('.');
         if (index == -1) {
             throw new InvalidFileException("File has no extension");
         }
 
         return fileName.substring(index + 1);
+    }
 
 
-
-//    public List<FileResponse> getAllFiles(UUID currentUserId){
-//        User user = getUser(currentUserId);
-//        List<FileMetadata> files = fileRepository.findByUploadedByAndDeletedAtIsNull(user);
-//        return mapper.mapToResponse(files);
-//
-//    }
-}}
+}
