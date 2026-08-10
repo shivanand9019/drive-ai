@@ -1,14 +1,26 @@
 package com.drive.driveai.file.service;
 
 import java.io.InputStream;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
 import com.drive.driveai.exception.FileMetadataNotFoundException;
 import com.drive.driveai.file.dto.DownloadFileResponse;
+import com.drive.driveai.file.dto.FileResponse;
+<<<<<<< Updated upstream
+import com.drive.driveai.file.dto.RenameFileRequest;
 import io.minio.*;
 import jakarta.transaction.Transactional;
+=======
+
+import io.minio.*;
+
+
+>>>>>>> Stashed changes
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -120,18 +132,13 @@ public class FileService {
         if (fileName == null || fileName.isBlank()) {
             throw new InvalidFileException("Invalid file Name");
         }
-        int index = fileName.lastIndexOf('.');
-        if (index == -1) {
-            throw new InvalidFileException("File has no extension");
-        }
 
-        String extension = fileName.substring(index + 1);
 
         String storageKey = "users/"
                 + userId
                 + "/"
                 + UUID.randomUUID()
-                + "." + extension;
+                + "." + getExtension(fileName);
 
         return storageKey;
     }
@@ -187,6 +194,7 @@ public class FileService {
 
     }
 
+<<<<<<< Updated upstream
     @Transactional
     public void deleteFile(UUID fileId, UUID currentUserId) {
 
@@ -208,5 +216,55 @@ public class FileService {
         }
         metadata.markAsDeleted();
         fileRepository.save(metadata);
+    }
+
+    // List All files of user
+
+    public Page<FileResponse> getMyFiles(UUID currentUserId, Pageable pageable){
+        Page<FileMetadata> page = fileRepository.findByUploadedByIdAndDeletedAtIsNull(currentUserId,pageable);
+        return page.map(mapper::mapToFileResponse);
+    }
+
+
+    // rename file
+    @Transactional
+    public FileResponse renameFile(
+            UUID fileId,
+            UUID currentUserId,
+            RenameFileRequest request){
+        FileMetadata metadata = fileRepository.findByIdAndDeletedAtIsNull(fileId).orElseThrow(()-> new FileMetadataNotFoundException("File not found with id:"+fileId));
+
+
+        if(!metadata.getUploadedBy().getId().equals(currentUserId)){
+            throw new AccessDeniedException("You are not authorized to access this file");
+        }
+        if(metadata.getOriginalFileName().equals(request.getFileName())){
+            return mapper.mapToFileResponse(metadata);
+        }
+        String oldExtension = getExtension(metadata.getOriginalFileName());
+        String newExtension = getExtension(request.getFileName());
+        if(!oldExtension.equalsIgnoreCase(newExtension)){
+            throw new FileMetadataNotFoundException( "Changing the file extension is not allowed.");
+        }
+
+        metadata.setOriginalFileName(request.getFileName());
+        metadata= fileRepository.save(metadata);
+        return mapper.mapToFileResponse(metadata);
+    }
+    private String getExtension(String fileName){
+        int index = fileName.lastIndexOf('.');
+        if (index == -1) {
+            throw new InvalidFileException("File has no extension");
+        }
+
+        return fileName.substring(index + 1);
+
+
+=======
+    public List<FileResponse> getAllFiles(UUID currentUserId){
+        User user = getUser(currentUserId);
+        List<FileMetadata> files = fileRepository.findByUploadedByAndDeletedAtIsNull(user);
+        return mapper.mapToResponse(files);
+>>>>>>> Stashed changes
     }
 }
