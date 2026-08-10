@@ -43,7 +43,7 @@ export function MyFiles() {
         const url = window.URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
-        link.download = file.name;
+        link.download = file.originalFileName;
         document.body.appendChild(link);
         link.click();
         link.remove();

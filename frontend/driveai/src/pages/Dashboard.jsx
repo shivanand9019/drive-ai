@@ -22,6 +22,7 @@ import Button from '@/components/Button';
 
 import { fileService } from '@/services/fileService';
 
+
 const QUICK_ACTIONS = [
   { label: 'Upload File', desc: 'Drag & drop or browse', icon: UploadCloud, accent: 'primary' },
   { label: 'Analyze Document', desc: 'Run AI insights', icon: FileText, accent: 'secondary' },
@@ -39,9 +40,11 @@ export default function Dashboard() {
   const loadFiles = async () => {
     try {
       const response = await fileService.getFiles();
-      setFiles(response);
+      console.log("Files API Response:",response);
+      setFiles(Array.isArray(response) ? response : []);
     } catch (error) {
       console.error(error);
+      setFiles([]);
     } finally {
       setLoading(false);
     }
