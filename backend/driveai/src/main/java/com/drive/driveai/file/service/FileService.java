@@ -1,15 +1,23 @@
 package com.drive.driveai.file.service;
 
 import java.io.InputStream;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
 import com.drive.driveai.exception.FileMetadataNotFoundException;
 import com.drive.driveai.file.dto.DownloadFileResponse;
 import com.drive.driveai.file.dto.FileResponse;
+<<<<<<< Updated upstream
 import com.drive.driveai.file.dto.RenameFileRequest;
 import io.minio.*;
 import jakarta.transaction.Transactional;
+=======
+
+import io.minio.*;
+
+
+>>>>>>> Stashed changes
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -186,6 +194,7 @@ public class FileService {
 
     }
 
+<<<<<<< Updated upstream
     @Transactional
     public void deleteFile(UUID fileId, UUID currentUserId) {
 
@@ -251,5 +260,11 @@ public class FileService {
         return fileName.substring(index + 1);
 
 
+=======
+    public List<FileResponse> getAllFiles(UUID currentUserId){
+        User user = getUser(currentUserId);
+        List<FileMetadata> files = fileRepository.findByUploadedByAndDeletedAtIsNull(user);
+        return mapper.mapToResponse(files);
+>>>>>>> Stashed changes
     }
 }

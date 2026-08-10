@@ -12,6 +12,10 @@ import com.drive.driveai.file.enums.FileStatus;
 import com.drive.driveai.user.entity.User;
 
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Component
 public class FileMapper {
@@ -37,6 +41,7 @@ public class FileMapper {
         response.setContentType(fileMetadata.getContentType());
         response.setFileSize(fileMetadata.getFileSize());
         response.setStatus(fileMetadata.getStatus());
+        
         return response;
 
     }
@@ -50,6 +55,7 @@ public class FileMapper {
 
 
     }
+<<<<<<< Updated upstream
     public FileResponse mapToFileResponse(FileMetadata metadata){
         FileResponse response = new FileResponse();
         response.setId(metadata.getId());
@@ -58,5 +64,29 @@ public class FileMapper {
         response.setContentType(metadata.getContentType());
         response.setStatus(metadata.getStatus());
         return response;
+=======
+
+    public List<FileResponse> mapToResponse(List<FileMetadata> files) {
+      List<FileResponse> responses = new ArrayList<>();
+
+
+      for (FileMetadata data:files){
+          FileResponse res =  new FileResponse();
+        res.setId(data.getId());
+        res.setOriginalFileName(data.getOriginalFileName());
+        res.setContentType(data.getContentType());
+        res.setFileSize(data.getFileSize());
+        res.setStatus(data.getStatus());
+        res.setUploadedAt(data.getUpdatedAt());
+          responses.add(res);
+      }
+
+
+      return  responses;
+
+>>>>>>> Stashed changes
     }
+   
+
+   
 }
