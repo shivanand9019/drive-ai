@@ -6,9 +6,11 @@ import Badge from './Badge';
 import { getFileMeta, formatBytes, formatDate } from '@/utils/fileTypes';
 
 function StatusBadge({ status }) {
-  if (status === 'Ready') return <Badge color="green" dot>Ready</Badge>;
-  if (status === 'Processing') return <Badge color="amber" dot>Processing</Badge>;
-  return <Badge color="slate" dot>{status}</Badge>;
+  if (status === "UPLOADED") {
+    return <Badge color="green">Uploaded</Badge>;
+  }
+
+  return <Badge color="slate">{status}</Badge>;
 }
 
 function AIStatusBadge({ status }) {
@@ -48,6 +50,8 @@ export default function FileTable({ files = [], onAction, loading = false }) {
   if (files.length === 0) {
     return null;
   }
+   console.log("files:", files);
+  console.log("isArray:", Array.isArray(files));
 
   return (
     <div className="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 overflow-hidden">
@@ -65,7 +69,9 @@ export default function FileTable({ files = [], onAction, loading = false }) {
               <th className="text-right text-xs font-semibold text-slate-500 uppercase tracking-wider px-5 py-3">Actions</th>
             </tr>
           </thead>
+      
           <tbody>
+             
             {files.map((file) => (
               <FileRow key={file.id} file={file} onAction={onAction} />
             ))}
@@ -84,7 +90,7 @@ export default function FileTable({ files = [], onAction, loading = false }) {
 }
 
 function FileRow({ file, onAction }) {
-  const meta = getFileMeta(file.name);
+  const meta = getFileMeta(file.originalFileName)
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
   useEffect(() => {
@@ -101,7 +107,7 @@ function FileRow({ file, onAction }) {
             <FileIcon className={`h-4.5 w-4.5 ${meta.color}`} />
           </div>
           <div className="min-w-0">
-            <p className="text-sm font-medium text-slate-800 dark:text-slate-100 truncate max-w-[220px]">{file.name}</p>
+            <p className="text-sm font-medium text-slate-800 dark:text-slate-100 truncate max-w-[220px]">{file.originalFileName}</p>
             <p className="text-xs text-slate-400">{file.owner || 'You'}</p>
           </div>
         </div>
@@ -109,7 +115,7 @@ function FileRow({ file, onAction }) {
       <td className="px-5 py-3.5">
         <span className="text-sm text-slate-600 dark:text-slate-300">{meta.label}</span>
       </td>
-      <td className="px-5 py-3.5 text-sm text-slate-600 dark:text-slate-300">{formatBytes(file.size)}</td>
+      <td className="px-5 py-3.5 text-sm text-slate-600 dark:text-slate-300">{formatBytes(file.fileSize)}</td>
       <td className="px-5 py-3.5 text-sm text-slate-600 dark:text-slate-300">{formatDate(file.uploadedAt)}</td>
       <td className="px-5 py-3.5"><StatusBadge status={file.status} /></td>
       <td className="px-5 py-3.5"><AIStatusBadge status={file.aiStatus} /></td>
@@ -146,7 +152,7 @@ function FileRow({ file, onAction }) {
 }
 
 function FileMobileRow({ file, onAction }) {
-  const meta = getFileMeta(file.name);
+  const meta = getFileMeta(file.originalFileName);
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
   useEffect(() => {
@@ -162,8 +168,8 @@ function FileMobileRow({ file, onAction }) {
           <FileIcon className={`h-5 w-5 ${meta.color}`} />
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-medium text-slate-800 dark:text-slate-100 truncate">{file.name}</p>
-          <p className="text-xs text-slate-400">{meta.label} · {formatBytes(file.size)} · {formatDate(file.uploadedAt)}</p>
+          <p className="text-sm font-medium text-slate-800 dark:text-slate-100 truncate">{file.originalFileName}</p>
+          <p className="text-xs text-slate-400">{meta.label} · {formatBytes(file.fileSize)} · {formatDate(file.uploadedAt)}</p>
         </div>
         <div className="relative" ref={ref}>
           <button onClick={() => setOpen((o) => !o)} className="p-2 rounded-lg text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800">

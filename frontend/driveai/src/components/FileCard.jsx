@@ -3,7 +3,7 @@ import Badge from './Badge';
 import { getFileMeta, formatBytes, formatDate } from '@/utils/fileTypes';
 
 export default function FileCard({ file, onAction }) {
-  const meta = getFileMeta(file.name);
+  const meta = getFileMeta(file.originalFileName);
 
   return (
     <div className="group rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 shadow-soft hover:shadow-card hover:-translate-y-1 transition-all duration-300">
@@ -16,7 +16,7 @@ export default function FileCard({ file, onAction }) {
         </button>
       </div>
 
-      <h4 className="mt-3 text-sm font-semibold text-slate-800 dark:text-slate-100 truncate">{file.name}</h4>
+      <h4 className="mt-3 text-sm font-semibold text-slate-800 dark:text-slate-100 truncate">{file.originalFileName}</h4>
       <p className="mt-0.5 text-xs text-slate-400">{meta.label} · {formatBytes(file.size)}</p>
 
       <div className="mt-3 flex items-center justify-between">

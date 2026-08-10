@@ -6,8 +6,9 @@ import api from "@/apis/axios.jsx";
 
 export async function getFiles() {
   // Backend list files endpoint is not implemented yet.
-  await new Promise((r) => setTimeout(r, 600));
-  return MOCK_FILES;
+  const response = await api.get("/files");
+
+  return response.data;
 }
 
 export async function uploadFile(file) {
