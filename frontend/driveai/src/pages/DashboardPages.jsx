@@ -10,26 +10,42 @@ import AIInsightsCard from '@/components/AIInsightsCard';
 import StorageCard from '@/components/StorageCard';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import { fileService } from '@/services/fileService';
+import Button from "@/components/Button.jsx";
 
-function useFiles() {
-  const [files, setFiles] = useState([]);
-  const [loading, setLoading] = useState(true);
-  useEffect(() => {
-    // TODO: Get Files API
-    fileService.getFiles().then((f) => { setFiles(f); setLoading(false); });
-  }, []);
-  return { files, loading, setFiles };
-}
 
-export function MyFiles() {
+export function  MyFiles() {
   const { query } = useOutletContext();
-  const { files, loading } = useFiles();
+
   const [view, setView] = useState('table');
   const [confirmDelete, setConfirmDelete] = useState(null);
+  const [files, setFiles] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
 
-  const filtered = query
-    ? files.filter((f) => f.name.toLowerCase().includes(query.toLowerCase()))
-    : files;
+
+  const loadFiles = async () =>{
+
+
+    try {
+      setLoading(true);
+
+      const response = await fileService.searchFiles(query,page, 20);
+
+      setFiles(response.content);
+      setTotalPages(response.totalPages);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadFiles();
+  }, [page]);
+  }
+
 
   const onAction = async (action, file) => {
     if (action === 'delete') {
@@ -196,18 +212,99 @@ export function Recent() {
 }
 
 export function Trash() {
-  const { files, loading } = useFiles();
+  const [files, setFiles] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+
+  const loadTrashFiles = async () => {
+    try {
+      setLoading(true);
+
+      const response = await fileService.getTrashFiles(page, 20);
+
+      setFiles(response.content);
+      setTotalPages(response.totalPages);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadTrashFiles();
+  }, [page]);
+
+  const handleAction = async (action, file) => {
+    if (action !== "restore") return;
+
+    try {
+      await fileService.restoreFile(file.id);
+
+      setFiles((prev) =>
+          prev.filter((item) => item.id !== file.id)
+      );
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
-    <PageShell title="Trash" subtitle="Files will be deleted after 30 days" icon={Trash2}>
-      {loading ? <LoadingSkeleton count={3} type="row" /> : files.length === 0 ? (
-        <Card><EmptyState icon={Trash2} title="Trash is empty" description="Deleted files will appear here." actionLabel={null} /></Card>
-      ) : (
-        <FileTable files={files.slice(0, 3)} />
-      )}
-    </PageShell>
+      <PageShell
+          title="Trash"
+          subtitle="Files will be deleted after 30 days"
+          icon={Trash2}
+      >
+        {loading ? (
+            <LoadingSkeleton count={3} type="row" />
+        ) : files.length === 0 ? (
+            <Card>
+              <EmptyState
+                  icon={Trash2}
+                  title="Trash is empty"
+                  description="Deleted files will appear here."
+                  actionLabel={null}
+              />
+            </Card>
+        ) : (
+            <>
+              <FileTable
+                  files={files}
+                  onAction={handleAction}
+                  trash
+              />
+
+              {totalPages > 1 && (
+                  <div className="flex justify-center items-center gap-4 mt-6">
+
+                    <button
+                        disabled={page === 0}
+                        onClick={() => setPage((p) => p - 1)}
+                        className="px-4 py-2 rounded-lg border disabled:opacity-50"
+                    >
+                      Previous
+                    </button>
+
+                    <span className="text-sm text-slate-500">
+                                Page {page + 1} of {totalPages}
+                            </span>
+
+                    <button
+                        disabled={page >= totalPages - 1}
+                        onClick={() => setPage((p) => p + 1)}
+                        className="px-4 py-2 rounded-lg border disabled:opacity-50"
+                    >
+                      Next
+                    </button>
+
+                  </div>
+              )}
+            </>
+        )}
+      </PageShell>
   );
 }
-
 export function SettingsPage() {
   return (
     <PageShell title="Settings" subtitle="Manage your preferences" icon={Settings}>

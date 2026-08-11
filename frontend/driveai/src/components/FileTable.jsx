@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect } from 'react';
 import {
-  MoreHorizontal, Download, Pencil, Trash2, Share2, Eye, File as FileIcon,
+  MoreHorizontal, Download, Pencil, Trash2, Share2, Eye, File as FileIcon, RotateCcw,
 } from 'lucide-react';
 import Badge from './Badge';
 import { getFileMeta, formatBytes, formatDate } from '@/utils/fileTypes';
@@ -20,7 +20,13 @@ function AIStatusBadge({ status }) {
   };
   return <Badge color={map[status] || 'slate'}>{status}</Badge>;
 }
-
+const TRASH_ACTIONS = [
+  {
+    label: 'Restore',
+    icon: RotateCcw,
+    action: 'restore',
+  },
+];
 const ACTIONS = [
   { label: 'View Details', icon: Eye, action: 'view' },
   { label: 'Download', icon: Download, action: 'download' },
@@ -29,7 +35,7 @@ const ACTIONS = [
   { label: 'Delete', icon: Trash2, action: 'delete', danger: true },
 ];
 
-export default function FileTable({ files = [], onAction, loading = false }) {
+export default function FileTable({ files = [], onAction, loading = false ,trash=false}) {
   if (loading) {
     return (
       <div className="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 overflow-hidden">
@@ -73,7 +79,7 @@ export default function FileTable({ files = [], onAction, loading = false }) {
           <tbody>
              
             {files.map((file) => (
-              <FileRow key={file.id} file={file} onAction={onAction} />
+              <FileRow key={file.id} file={file} onAction={onAction} trash={trash} />
             ))}
           </tbody>
         </table>
@@ -89,7 +95,7 @@ export default function FileTable({ files = [], onAction, loading = false }) {
   );
 }
 
-function FileRow({ file, onAction }) {
+function FileRow({ file, onAction ,trash}) {
   const meta = getFileMeta(file.originalFileName)
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
@@ -130,7 +136,7 @@ function FileRow({ file, onAction }) {
           </button>
           {open && (
             <div className="absolute right-0 mt-1 w-44 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-card p-1.5 z-20 animate-scale-in origin-top-right">
-              {ACTIONS.map((a) => (
+              {(trash ? TRASH_ACTIONS:ACTIONS).map((a) => (
                 <button
                   key={a.action}
                   onClick={() => { setOpen(false); onAction?.(a.action, file); }}
@@ -151,7 +157,7 @@ function FileRow({ file, onAction }) {
   );
 }
 
-function FileMobileRow({ file, onAction }) {
+function FileMobileRow({ file, onAction ,trash}) {
   const meta = getFileMeta(file.originalFileName);
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
@@ -177,7 +183,7 @@ function FileMobileRow({ file, onAction }) {
           </button>
           {open && (
             <div className="absolute right-0 mt-1 w-44 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-card p-1.5 z-20 animate-scale-in origin-top-right">
-              {ACTIONS.map((a) => (
+              {(trash ? TRASH_ACTIONS:ACTIONS).map((a) => (
                 <button
                   key={a.action}
                   onClick={() => { setOpen(false); onAction?.(a.action, file); }}

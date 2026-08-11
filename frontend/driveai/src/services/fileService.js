@@ -29,7 +29,7 @@ export async function uploadFile(file) {
 
 export async function downloadFile(fileId) {
   try {
-    const response = await api.get(`/files/${fileId}`, { responseType: "blob" });
+    const response = await api.get(`/files/download/${fileId}`, { responseType: "blob" });
     return response.data;
   } catch (error) {
     console.error(error);
@@ -39,7 +39,7 @@ export async function downloadFile(fileId) {
 
 export async function renameFile(fileId, fileName) {
  try{
-   const response = await api.patch(`/files/${fileId}/rename`,
+   const response = await api.patch(`/files/rename/${fileId}`,
        {fileName,});
    return response.data;
  }catch (error){
@@ -50,13 +50,53 @@ export async function renameFile(fileId, fileName) {
 
 export async function deleteFile(fileId) {
   try{
-    await  api.delete(`/files/${fileId}`);
+    await  api.delete(`/files/delete/${fileId}`);
   } catch (error){
     console.error(error);
     throw  error;
   }
 }
 
+export async  function getTrashFiles(pages=0, size=20){
+  try{
+    const response = await api.get("/files/trash",{
+      params:{
+        pages,size
+      },
+
+    });
+    return response.data;
+  } catch (error){
+    console.error(error);
+    throw  error;
+  }
+}
+
+export async  function restoreFile(fileId){
+  try{
+    await api.patch(`/files/restore/${fileId}`);
+
+  }catch (error){
+    console.error(error);
+    throw error;
+  }
+}
+
+
+export async  function searchFiles(searchText,pages=0, size=20){
+  try{
+    const response = await api.get("/files/search",{
+      params:{
+        searchText,pages,size
+      },
+
+    });
+    return response.data.content;
+  } catch (error){
+    console.error(error);
+    throw  error;
+  }
+}
 export async function shareFile(fileId, email) {
   // Backend share endpoint is not implemented yet.
   await new Promise((r) => setTimeout(r, 300));
@@ -86,6 +126,9 @@ export const fileService = {
   downloadFile,
   renameFile,
   deleteFile,
+  getTrashFiles,
+  restoreFile,
+  searchFiles,
   shareFile,
   analyzeFile,
 };

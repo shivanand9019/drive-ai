@@ -1,4 +1,4 @@
-package com.drive.driveai.file.repository;
+package com.drive.driveai.file.enums.repository;
 
 import java.util.List;
 import java.util.Optional;
@@ -20,8 +20,11 @@ public interface FileRepository extends JpaRepository<FileMetadata,UUID>{
 
     Page<FileMetadata> findByUploadedByIdAndDeletedAtIsNull(UUID userId, Pageable pageable);
 
-    List<FileMetadata> findByUploadedByAndDeletedAtIsNull(User user );
+    Page<FileMetadata> findByUploadedByAndDeletedAtIsNotNull(User user,Pageable pageable );
 
-
+    Page<FileMetadata> findByUploadedByAndDeletedAtIsNull(
+            User user,
+            Pageable pageable
+    );
     
 }
