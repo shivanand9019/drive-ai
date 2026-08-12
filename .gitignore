@@ -25,3 +25,5 @@ replay_pid*
 
 #  secret files
 *.env
+
+/frontend/driveai/.bolt/
