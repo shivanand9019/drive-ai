@@ -16,7 +16,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/v1/auth")
+@RequestMapping("/auth")
 @RequiredArgsConstructor
 //@CrossOrigin("http://localhost:5173/*")
 public class AuthController {

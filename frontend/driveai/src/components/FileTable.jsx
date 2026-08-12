@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect } from 'react';
 import {
-  MoreHorizontal, Download, Pencil, Trash2, Share2, Eye, File as FileIcon, RotateCcw,
+  MoreHorizontal, Download, Pencil, Trash2, Share2, Eye, File as FileIcon, RotateCcw, DeleteIcon,
 } from 'lucide-react';
 import Badge from './Badge';
 import { getFileMeta, formatBytes, formatDate } from '@/utils/fileTypes';
@@ -25,7 +25,15 @@ const TRASH_ACTIONS = [
     label: 'Restore',
     icon: RotateCcw,
     action: 'restore',
+
+
   },
+  {
+    label: 'Delete Permanently',
+    icon : Trash2,
+    action: 'permanentDelete',
+    danger: true,
+  }
 ];
 const ACTIONS = [
   { label: 'View Details', icon: Eye, action: 'view' },
@@ -88,7 +96,7 @@ export default function FileTable({ files = [], onAction, loading = false ,trash
       {/* Mobile cards */}
       <div className="md:hidden divide-y divide-slate-100 dark:divide-slate-800">
         {files.map((file) => (
-          <FileMobileRow key={file.id} file={file} onAction={onAction} />
+          <FileMobileRow key={file.id} file={file} onAction={onAction} trash={trash} />
         ))}
       </div>
     </div>

@@ -9,8 +9,9 @@ import LoadingSkeleton from '@/components/LoadingSkeleton';
 import AIInsightsCard from '@/components/AIInsightsCard';
 import StorageCard from '@/components/StorageCard';
 import ConfirmDialog from '@/components/ConfirmDialog';
-import { fileService } from '@/services/fileService';
+import {fileService} from '@/services/fileService';
 import Button from "@/components/Button.jsx";
+import FileDetailsDialog from "@/components/FileDetailsDialog.jsx";
 
 
 export function  MyFiles() {
@@ -22,6 +23,10 @@ export function  MyFiles() {
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
+  const [permanentDeleteFile, setPermanentDeleteFile] = useState(null);
+
+
+  const [selectedFile,setSelectedFile] = useState(null);
 
 
   const loadFiles = async () =>{
@@ -29,11 +34,19 @@ export function  MyFiles() {
 
     try {
       setLoading(true);
+      if(query.trim() === "") {
+        const response  = await fileService.getFiles(page,20);
 
-      const response = await fileService.searchFiles(query,page, 20);
 
-      setFiles(response.content);
-      setTotalPages(response.totalPages);
+        setFiles(response.content);
+        setTotalPages(response.totalPages);
+      }else {
+
+        const response = await fileService.searchFiles(query, page, 20);
+
+        setFiles(response.content);
+        setTotalPages(response.totalPages);
+      }
     } catch (error) {
       console.error(error);
     } finally {
@@ -43,9 +56,11 @@ export function  MyFiles() {
 
   useEffect(() => {
     loadFiles();
-  }, [page]);
-  }
+  }, [page,query]);
 
+  useEffect(() => {
+   setPage(0)
+  }, [query]);
 
   const onAction = async (action, file) => {
     if (action === 'delete') {
@@ -69,6 +84,13 @@ export function  MyFiles() {
       }
 
     }console.log(action, file); // TODO: Rename/Share/View API not implemented in backend yet
+
+    if(action==='view'){
+
+      setSelectedFile(file);
+      return;
+
+    }
     if( action === 'rename') {
       const fileName = window.prompt(
           "Enter new file name:",
@@ -102,7 +124,7 @@ export function  MyFiles() {
   };
 
   return (
-    <PageShell title="My Files" subtitle={`${filtered.length} files`} icon={FolderOpen}>
+    <PageShell title="My Files" subtitle={`${files.length} files`} icon={FolderOpen}>
       <div className="flex items-center justify-between mb-4">
         <div className="inline-flex rounded-xl bg-slate-100 dark:bg-slate-800 p-1">
           {['table', 'grid'].map((v) => (
@@ -118,23 +140,58 @@ export function  MyFiles() {
       </div>
       {loading ? (
         <LoadingSkeleton count={6} type="row" />
-      ) : filtered.length === 0 ? (
+      ) : files.length === 0 ? (
         <Card><EmptyState onAction={() => {}} /></Card>
       ) : view === 'table' ? (
-        <FileTable files={filtered} onAction={onAction} />
+        <FileTable files={files} onAction={onAction} />
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-          {filtered.map((f) => <FileCard key={f.id} file={f} onAction={onAction} />)}
+          {files.map((f) => <FileCard key={f.id} file={f} onAction={onAction} />)}
         </div>
+      )}
+      {totalPages > 1 && (
+          <div className="flex justify-center items-center gap-4 mt-6">
+            <button
+                disabled={page === 0}
+                onClick={() => setPage((p) => p - 1)}
+                className="px-4 py-2 rounded-lg border disabled:opacity-50"
+            >
+              Previous
+            </button>
+
+            <span className="text-sm text-slate-500">
+      Page {page + 1} of {totalPages}
+    </span>
+
+            <button
+                disabled={page >= totalPages - 1}
+                onClick={() => setPage((p) => p + 1)}
+                className="px-4 py-2 rounded-lg border disabled:opacity-50"
+            >
+              Next
+            </button>
+          </div>
       )}
       <ConfirmDialog
         open={!!confirmDelete}
         title="Delete this file?"
         message={`"${confirmDelete?.originalFileName}" will be moved to trash.`}
         confirmLabel="Delete"
-        onConfirm={async () => { await fileService.deleteFile(confirmDelete.id); setConfirmDelete(null); }}
+        onConfirm={async () => { await fileService.deleteFile(confirmDelete.id);
+
+
+          setFiles((prev) =>
+              prev.filter((item) => item.id !== confirmDelete.id));
+          setConfirmDelete(null);
+        }}
         onCancel={() => setConfirmDelete(null)}
       />
+
+      <FileDetailsDialog
+        file={selectedFile}
+        open ={selectedFile!==null}
+        onClose={()=>setSelectedFile(null)}
+            />
     </PageShell>
   );
 }
@@ -216,6 +273,7 @@ export function Trash() {
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
+  const [permanentDeleteFile, setPermanentDeleteFile] = useState(null);
 
   const loadTrashFiles = async () => {
     try {
@@ -237,20 +295,30 @@ export function Trash() {
   }, [page]);
 
   const handleAction = async (action, file) => {
-    if (action !== "restore") return;
+    if (action === "restore") {
 
-    try {
-      await fileService.restoreFile(file.id);
+      try {
+        await fileService.restoreFile(file.id);
 
-      setFiles((prev) =>
-          prev.filter((item) => item.id !== file.id)
-      );
-    } catch (error) {
-      console.error(error);
+        setFiles((prev) =>
+            prev.filter((item) => item.id !== file.id)
+        );
+      } catch (error) {
+        console.error(error);
+      }
+      return;
     }
+    if (action === "permanentDelete") {
+      console.log("Permanent delete clicked:", file);
+      setPermanentDeleteFile(file);
+      return;
+    }
+
   };
 
+
   return (
+
       <PageShell
           title="Trash"
           subtitle="Files will be deleted after 30 days"
@@ -302,8 +370,28 @@ export function Trash() {
               )}
             </>
         )}
+        <ConfirmDialog
+            open={!!permanentDeleteFile}
+            title="Delete permanently?"
+            message={`"${permanentDeleteFile?.originalFileName}" will be permanently deleted. This action cannot be undone.`}
+            confirmLabel="Delete Permanently"
+            danger
+            onConfirm={async () => {
+              await fileService.deletePermanently(permanentDeleteFile.id);
+
+              setFiles((prev) =>
+                  prev.filter((item) => item.id !== permanentDeleteFile.id)
+              );
+
+              setPermanentDeleteFile(null);
+            }}
+            onCancel={() => setPermanentDeleteFile(null)}
+        />
       </PageShell>
+
+
   );
+
 }
 export function SettingsPage() {
   return (

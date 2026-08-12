@@ -40,10 +40,9 @@ public class UserController {
     @GetMapping("/me")
     public ResponseEntity<CurrentUserResponse> getCurrentUser(
         @AuthenticationPrincipal CustomUserDetails user){
-        
+
        return ResponseEntity.ok(userService.getCurrentUser(user.getId()));
     }
-    
 
-    
+
 }

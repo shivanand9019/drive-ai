@@ -1,13 +1,16 @@
-package com.drive.driveai.file.enums.repository;
+package com.drive.driveai.file.repository;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
+import com.drive.driveai.file.dto.FileResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.query.JpqlQueryBuilder;
 import org.springframework.stereotype.Repository;
 
 import com.drive.driveai.file.entity.FileMetadata;
@@ -26,5 +29,9 @@ public interface FileRepository extends JpaRepository<FileMetadata,UUID>{
             User user,
             Pageable pageable
     );
+
+    Optional<FileMetadata> findByIdAndDeletedAtIsNotNull(UUID fileId);
+
+    Page<FileMetadata> findByUploadedByAndOriginalFileNameContainingIgnoreCaseAndDeletedAtIsNull(User uploadedBy,String searchText,Pageable pageable);
     
 }

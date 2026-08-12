@@ -27,7 +27,7 @@ import com.drive.driveai.security.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/v1/files")
+@RequestMapping("/files")
 @RequiredArgsConstructor
 @CrossOrigin("http://localhost:5173/*")
 public class FileController {
@@ -49,7 +49,9 @@ public class FileController {
 
 
     }
-    @GetMapping("/{fileId}")
+
+    // download endpoint
+    @GetMapping("/download/{fileId}")
     public ResponseEntity<InputStreamResource> downloadFile(@PathVariable UUID fileId,Authentication authentication){
         CustomUserDetails user = (CustomUserDetails) authentication.getPrincipal();
         UUID userId = user != null ? user.getUser().getId() : null;
@@ -62,8 +64,8 @@ public class FileController {
                 .body(resource);
     }
 
-
-    @DeleteMapping("/{fileId}")
+// delete endpoint
+    @DeleteMapping("/delete/{fileId}")
     public ResponseEntity<Void> deleteFile(@PathVariable UUID fileId,Authentication authentication){
         CustomUserDetails user = (CustomUserDetails) authentication.getPrincipal();
 
@@ -72,6 +74,15 @@ public class FileController {
 
     }
 
+    // delete permanently
+    @DeleteMapping("/delete/{fileId}/permanent")
+    public ResponseEntity<Void>  permanentlyDeleteFile(@PathVariable UUID fileId,Authentication authentication){
+        CustomUserDetails userDetails = (CustomUserDetails)  authentication.getPrincipal();
+
+        fileService.permanentlyDeleteFile(fileId,userDetails.getUser().getId());
+        return ResponseEntity.noContent().build();
+    }
+    // get all files
     @GetMapping
     public ResponseEntity<Page<FileResponse>> getMyFiles(Pageable pageable,Authentication authentication){
         CustomUserDetails user = (CustomUserDetails)  authentication.getPrincipal();
@@ -80,7 +91,8 @@ public class FileController {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(response);
     }
-    @PatchMapping("/{fileId}/rename")
+    // rename
+    @PatchMapping("/rename/{fileId}")
     public ResponseEntity<FileResponse> renameFile(@PathVariable UUID fileId,@Valid @RequestBody RenameFileRequest request, Authentication authentication){
         CustomUserDetails user = (CustomUserDetails) authentication.getPrincipal();
         UUID currentUserId = user.getUser().getId();
@@ -90,11 +102,36 @@ public class FileController {
                 .body(response);
     }
 
-    
-//    @GetMapping()
-//    public ResponseEntity<Page<FileResponse>> getMyFiles(Authentication authentication,Pageable pageable){
-//        CustomUserDetails user = (CustomUserDetails) authentication.getPrincipal();
-//        UUID userId = user != null ? user.getUser().getId() : null;
-//        return ResponseEntity.ok(fileService.getMyFiles(userId,pageable));
-//    }
+    // get trash files
+    @GetMapping("/trash")
+    public ResponseEntity<Page<FileResponse>> getTrashFiles(Authentication authentication,Pageable pageable){
+        CustomUserDetails user = (CustomUserDetails)  authentication.getPrincipal();
+
+        Page<FileResponse>  response = fileService.getTrashFiles(user,pageable);
+        return  ResponseEntity.ok(response);
+    }
+
+
+    // restore
+
+    @PatchMapping("/restore/{fileId}")
+        public ResponseEntity<Void>  restoreFile(@PathVariable UUID fileId,Authentication authentication){
+
+        CustomUserDetails  user = (CustomUserDetails)  authentication.getPrincipal();
+
+        fileService.restoreFile(fileId,user.getUser().getId());
+        return ResponseEntity.noContent().build();
+
+    }
+
+  // search files
+    @GetMapping("/search")
+    public ResponseEntity<Page<FileResponse>> searchFiles(Authentication authentication,@RequestParam String searchText ,Pageable pageable){
+        CustomUserDetails user = (CustomUserDetails) authentication.getPrincipal();
+        Page<FileResponse>  response = fileService.searchFiles(user.getUser().getId(),searchText,pageable);
+        return ResponseEntity.ok(response);
+    }
+
+
+
 }

@@ -9,12 +9,9 @@ import com.drive.driveai.exception.FileMetadataNotFoundException;
 import com.drive.driveai.file.dto.DownloadFileResponse;
 import com.drive.driveai.file.dto.FileResponse;
 import com.drive.driveai.file.dto.RenameFileRequest;
+import com.drive.driveai.security.CustomUserDetails;
 import io.minio.*;
 import jakarta.transaction.Transactional;
-
-
-import io.minio.*;
-
 
 
 import org.springframework.beans.factory.annotation.Value;
@@ -204,16 +201,16 @@ public class FileService {
         if(!metadata.getUploadedBy().getId().equals(currentUserId)){
             throw  new AccessDeniedException("You are not authorized to access this file");
         }
-        try {
-            minioClient.removeObject(
-
-                    RemoveObjectArgs.builder()
-                            .bucket(bucket)
-                            .object(metadata.getStorageKey())
-                            .build());
-        } catch (Exception e){
-            throw new FileStorageException("Error while deleting file",e);
-        }
+//        try {
+//            minioClient.removeObject(
+//
+//                    RemoveObjectArgs.builder()
+//                            .bucket(bucket)
+//                            .object(metadata.getStorageKey())
+//                            .build());
+//        } catch (Exception e){
+//            throw new FileStorageException("Error while deleting file",e);
+//        }
         metadata.markAsDeleted();
         fileRepository.save(metadata);
     }
@@ -258,6 +255,61 @@ public class FileService {
         }
 
         return fileName.substring(index + 1);
+    }
+
+    // trash files
+    public Page<FileResponse> getTrashFiles(CustomUserDetails userDetails, Pageable pageable) {
+        System.out.println("🔥 TRASH ENDPOINT HIT");
+        User user = userDetails.getUser();
+
+        Page<FileMetadata> files = fileRepository.findByUploadedByAndDeletedAtIsNotNull(user,pageable);
+
+        return files.map(mapper::mapToFileResponse);
+
+    }
+    // restore file
+    public void restoreFile(UUID fileId,UUID currentUserId) {
+
+        FileMetadata metadata = fileRepository.findByIdAndDeletedAtIsNotNull(fileId)
+                .orElseThrow(()->  new FileMetadataNotFoundException("File not found in trash"));
+
+        if(!metadata.getUploadedBy().getId().equals(currentUserId)){
+            throw  new AccessDeniedException("You are not authorized to restore this file");
+
+        }
+        metadata.setDeletedAt(null);
+        fileRepository.save(metadata);
+    }
+
+    // search file
+    public Page<FileResponse> searchFiles(UUID currentUserId,String searchText,Pageable pageable){
+
+        User user = getUser(currentUserId);
+        Page<FileMetadata> files = fileRepository.findByUploadedByAndOriginalFileNameContainingIgnoreCaseAndDeletedAtIsNull(user,searchText,pageable);
+
+        return files.map(mapper::mapToFileResponse);
+    }
+    @Transactional
+    public void permanentlyDeleteFile(UUID fileId,UUID currentUserId) {
+        FileMetadata metadata = fileRepository.findByIdAndDeletedAtIsNotNull(fileId)
+                .orElseThrow(()-> new FileMetadataNotFoundException("File not found"));
+
+        if(!metadata.getUploadedBy().getId().equals(currentUserId)){
+            throw  new AccessDeniedException("You are not authorized to access this file");
+        }
+
+        try {
+            minioClient.removeObject(
+
+                    RemoveObjectArgs.builder()
+                            .bucket(bucket)
+                            .object(metadata.getStorageKey())
+                            .build());
+        } catch (Exception e){
+            throw new FileStorageException("Error while deleting file",e);
+        }
+
+        fileRepository.delete(metadata);
     }
 
 

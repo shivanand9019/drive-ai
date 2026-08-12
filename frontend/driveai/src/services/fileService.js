@@ -8,7 +8,7 @@ export async function getFiles() {
   // Backend list files endpoint is not implemented yet.
   const response = await api.get("/files");
 
-  return response.data.content;
+  return response.data;
 }
 
 export async function uploadFile(file) {
@@ -91,10 +91,20 @@ export async  function searchFiles(searchText,pages=0, size=20){
       },
 
     });
-    return response.data.content;
+    return response.data;
   } catch (error){
     console.error(error);
     throw  error;
+  }
+}
+
+export async  function deletePermanently(fileId){
+  try{
+    await api.delete(`/files/delete/${fileId}/permanent`)
+
+  }catch (error){
+    console.error(error);
+    throw error;
   }
 }
 export async function shareFile(fileId, email) {
@@ -129,6 +139,7 @@ export const fileService = {
   getTrashFiles,
   restoreFile,
   searchFiles,
+  deletePermanently,
   shareFile,
   analyzeFile,
 };

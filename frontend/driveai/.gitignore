@@ -21,3 +21,4 @@ dist-ssr
 *.sln
 *.sw?
 .env
+backend/driveai/src/main/resources/application.properties
