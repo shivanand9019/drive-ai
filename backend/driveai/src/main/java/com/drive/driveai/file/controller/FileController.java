@@ -1,11 +1,11 @@
 package com.drive.driveai.file.controller;
 
-import java.util.Objects;
 import java.util.UUID;
 
 import com.drive.driveai.file.dto.DownloadFileResponse;
 import com.drive.driveai.file.dto.FileResponse;
 import com.drive.driveai.file.dto.RenameFileRequest;
+import jakarta.annotation.PostConstruct;
 import jakarta.validation.Valid;
 import lombok.Value;
 import org.springframework.core.io.InputStreamResource;
@@ -22,18 +22,22 @@ import org.springframework.web.multipart.MultipartFile;
 import com.drive.driveai.file.dto.UploadFileResponse;
 import com.drive.driveai.file.service.FileService;
 import com.drive.driveai.security.CustomUserDetails;
-import com.drive.driveai.security.CustomUserDetailsService;
+
 
 import lombok.RequiredArgsConstructor;
+
+
 
 @RestController
 @RequestMapping("/files")
 @RequiredArgsConstructor
-@CrossOrigin("http://localhost:5173/*")
 public class FileController {
 
     private final FileService fileService;
-   
+    @PostConstruct
+    public void init() {
+        System.out.println("🔥 FILE CONTROLLER LOADED");
+    }
     @PostMapping("/upload")
     public ResponseEntity<UploadFileResponse> upload(
         @RequestParam("file") MultipartFile file,
@@ -132,6 +136,28 @@ public class FileController {
         return ResponseEntity.ok(response);
     }
 
+    // favorite
+    @PutMapping("/{fileId}/favorite")
+    public ResponseEntity<Void> favoriteFile(@PathVariable UUID fileId,Authentication authentication){
+        CustomUserDetails user = (CustomUserDetails) authentication.getPrincipal();
+        fileService.favoriteFile(fileId,user.getUser().getId());
+        return ResponseEntity.noContent().build();
+    }
 
+
+    // Un favorite file
+    @DeleteMapping("/{fileId}/favorite")
+    public  ResponseEntity<Void> unFavoriteFile(@PathVariable UUID fileId, Authentication authentication){
+        CustomUserDetails user = (CustomUserDetails) authentication.getPrincipal();
+        fileService.unFavoriteFile(fileId,user.getUser().getId());
+        return ResponseEntity.noContent().build();
+    }
+    @GetMapping("/favorites")
+    public ResponseEntity<Page<FileResponse>> getFavoriteFiles(Authentication authentication,Pageable pageable){
+        CustomUserDetails user = (CustomUserDetails)  authentication.getPrincipal();
+        Page<FileResponse> response = fileService.getFavoriteFiles(user.getUser(),pageable);
+
+        return ResponseEntity.ok(response);
+    }
 
 }

@@ -20,6 +20,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.Builder.Default;
 
 @Entity
 @Table(name="file_metadata")
@@ -37,6 +38,9 @@ public class FileMetadata extends BaseEntity{
     private String storageKey;
     private String contentType;
     private Long fileSize;
+
+   
+    private boolean isFavorite;
 
     @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="uploaded_by",nullable = false)

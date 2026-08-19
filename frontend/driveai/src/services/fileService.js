@@ -1,11 +1,9 @@
-// File service — backend integration placeholders.
-// Upload and download are wired to backend where available.
-// Other file operations remain TODO until backend routes are implemented.
+
 
 import api from "@/apis/axios.jsx";
 
 export async function getFiles() {
-  // Backend list files endpoint is not implemented yet.
+
   const response = await api.get("/files");
 
   return response.data;
@@ -107,6 +105,36 @@ export async  function deletePermanently(fileId){
     throw error;
   }
 }
+
+export async function favoriteFile(fileId) {
+  try {
+    await api.put(`/files/${fileId}/favorite`)
+
+
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+}
+
+export  async  function unFavoriteFile(fileId){
+  try{
+    await api.delete(`/files/${fileId}/favorite`)
+  } catch (error){
+    console.log(error);
+    throw  error;
+  }
+}
+
+export async function  getFavoriteFiles(page=0,size=20){
+  try{
+    const response = await api.get("/files/favorites");
+    return response.data;
+  }catch (error){
+    console.error(error);
+    throw error;
+  }
+}
 export async function shareFile(fileId, email) {
   // Backend share endpoint is not implemented yet.
   await new Promise((r) => setTimeout(r, 300));
@@ -140,6 +168,10 @@ export const fileService = {
   restoreFile,
   searchFiles,
   deletePermanently,
+  favoriteFile,
+  unFavoriteFile,
+  getFavoriteFiles,
+
   shareFile,
   analyzeFile,
 };
