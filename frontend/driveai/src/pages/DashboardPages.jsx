@@ -22,6 +22,7 @@ import ConfirmDialog from '@/components/ConfirmDialog';
 import { fileService } from '@/services/fileService';
 import Button from "@/components/Button.jsx";
 import FileDetailsDialog from "@/components/FileDetailsDialog.jsx";
+import {useTheme} from "@/context/ThemeContext.jsx";
 
 
 /* =========================================================
@@ -684,8 +685,29 @@ export function Favorites() {
 
 
 export function Recent() {
+  const [files, setFiles] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [page, setPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
 
-  const { files, loading } = useFiles();
+  const loadRecentFiles = async () => {
+    try {
+      setLoading(true);
+
+      const response = await fileService.getRecentFiles(page, 20);
+
+      setFiles(response.content);
+      setTotalPages(response.totalPages);
+    } catch (error) {
+      console.error("Failed to load recent files:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadRecentFiles();
+  }, [page]);
 
   return (
       <PageShell
@@ -693,32 +715,49 @@ export function Recent() {
           subtitle="Recently uploaded files"
           icon={Clock}
       >
-
         {loading ? (
-
-            <LoadingSkeleton
-                count={5}
-                type="row"
-            />
-
+            <LoadingSkeleton count={5} type="row" />
+        ) : files.length === 0 ? (
+            <Card>
+              <EmptyState
+                  icon={Clock}
+                  title="No recent files"
+                  description="Recently uploaded files will appear here."
+                  actionLabel={null}
+              />
+            </Card>
         ) : (
+            <>
+              <FileTable files={files} />
 
-            <FileTable
-                files={[
-                  ...files
-                ].sort(
-                    (a, b) =>
-                        new Date(b.uploadedAt) -
-                        new Date(a.uploadedAt)
-                )}
-            />
+              {totalPages > 1 && (
+                  <div className="flex justify-center items-center gap-4 mt-6">
+                    <button
+                        disabled={page === 0}
+                        onClick={() => setPage((p) => p - 1)}
+                        className="px-4 py-2 rounded-lg border disabled:opacity-50"
+                    >
+                      Previous
+                    </button>
 
+                    <span className="text-sm text-slate-500">
+                Page {page + 1} of {totalPages}
+              </span>
+
+                    <button
+                        disabled={page >= totalPages - 1}
+                        onClick={() => setPage((p) => p + 1)}
+                        className="px-4 py-2 rounded-lg border disabled:opacity-50"
+                    >
+                      Next
+                    </button>
+                  </div>
+              )}
+            </>
         )}
-
       </PageShell>
   );
 }
-
 
 //  TRASH
 

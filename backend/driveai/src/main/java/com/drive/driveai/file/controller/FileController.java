@@ -160,4 +160,13 @@ public class FileController {
         return ResponseEntity.ok(response);
     }
 
+
+    // recent files
+
+    @GetMapping("/recent")
+    public ResponseEntity<Page<FileResponse>> getRecentFiles(Authentication authentication,Pageable pageable){
+        CustomUserDetails user = (CustomUserDetails) authentication.getPrincipal();
+        Page<FileResponse> response = fileService.getRecentFiles(user.getUser(),pageable);
+        return ResponseEntity.ok(response);
+    }
 }
