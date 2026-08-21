@@ -1,6 +1,6 @@
 import { NavLink } from 'react-router-dom';
 import {
-  LayoutDashboard, FolderOpen, UploadCloud, Sparkles, Star, Clock, Trash2, Settings,
+  LayoutDashboard, FolderOpen, UploadCloud, Sparkles, Star, Clock, Trash2, Settings, Share2,
 } from 'lucide-react';
 import Logo from './Logo';
 
@@ -13,6 +13,7 @@ const NAV = [
   ]},
   { section: 'Library', items: [
     { label: 'Favorites', to: '/dashboard/favorites', icon: Star },
+      {label: 'Shared with me', to:'/dashboard/shared', icon:Share2},
     { label: 'Recent', to: '/dashboard/recent', icon: Clock },
     { label: 'Trash', to: '/dashboard/trash', icon: Trash2 },
   ]},

@@ -201,16 +201,6 @@ public class FileService {
         if(!metadata.getUploadedBy().getId().equals(currentUserId)){
             throw  new AccessDeniedException("You are not authorized to access this file");
         }
-//        try {
-//            minioClient.removeObject(
-//
-//                    RemoveObjectArgs.builder()
-//                            .bucket(bucket)
-//                            .object(metadata.getStorageKey())
-//                            .build());
-//        } catch (Exception e){
-//            throw new FileStorageException("Error while deleting file",e);
-//        }
         metadata.markAsDeleted();
         fileRepository.save(metadata);
     }
