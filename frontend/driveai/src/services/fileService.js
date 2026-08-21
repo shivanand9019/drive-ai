@@ -151,10 +151,33 @@ export async function  getRecentFiles(page=0,size=20){
     throw error;
   }
 }
-export async function shareFile(fileId, email) {
-  // Backend share endpoint is not implemented yet.
-  await new Promise((r) => setTimeout(r, 300));
-  return { ok: true, url: `https://driveai.app/s/${fileId}` };
+export async function shareFile(fileId, recipientEmail) {
+  try {
+    await api.post(`/files/share/${fileId}`, null, {
+      params: {
+        recipientEmail,
+      },
+    });
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+}
+
+export async function getSharedFiles(page = 0, size = 20) {
+  try {
+    const response = await api.get("/files/share", {
+      params: {
+        page,
+        size,
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
 }
 
 export async function analyzeFile(fileId) {
@@ -190,5 +213,6 @@ export const fileService = {
   getRecentFiles,
 
   shareFile,
+  getSharedFiles,
   analyzeFile,
 };

@@ -155,5 +155,10 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(response);
         }
-                        
+
+        @ExceptionHandler(FileAlreadySharedException.class)
+        public ResponseEntity<String> handleFileAlreadySharedException(FileAlreadySharedException ex){
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(ex.getMessage());
+        }
 }
