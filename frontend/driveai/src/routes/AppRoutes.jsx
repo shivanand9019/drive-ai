@@ -8,6 +8,7 @@ import {
   MyFiles, Upload, AIInsights, Favorites, Recent, Trash, SettingsPage,
 } from '@/pages/DashboardPages';
 import ProtectedRoute from "@/routes/ProtectedRoute.jsx";
+import {SharedFiles} from "@/components/SharedFiles.jsx";
 
 export default function AppRoutes() {
   return (
@@ -22,8 +23,10 @@ export default function AppRoutes() {
         <Route path="upload" element={<Upload />} />
         <Route path="insights" element={<AIInsights />} />
         <Route path="favorites" element={<Favorites />} />
+        <Route path="shared"  element={<SharedFiles/>}/>
         <Route path="recent" element={<Recent />} />
         <Route path="trash" element={<Trash />} />
+
         <Route path="settings" element={<SettingsPage />} />
       </Route>
          <Route path="*" element={<Navigate to="/" replace />} />

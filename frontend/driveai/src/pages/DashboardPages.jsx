@@ -22,6 +22,7 @@ import ConfirmDialog from '@/components/ConfirmDialog';
 import { fileService } from '@/services/fileService';
 import Button from "@/components/Button.jsx";
 import FileDetailsDialog from "@/components/FileDetailsDialog.jsx";
+import ShareDialog from "@/components/SharedFileDialog.jsx";
 
 
 /* =========================================================
@@ -40,6 +41,7 @@ export function MyFiles() {
   const [totalPages, setTotalPages] = useState(0);
   const [permanentDeleteFile, setPermanentDeleteFile] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
+  const [shareFile, setShareFile] = useState(null);
 
 
   /* ---------------- LOAD FILES ---------------- */
@@ -197,7 +199,15 @@ export function MyFiles() {
 
 
     console.log(action, file);
-  };
+
+
+    if (action === "share") {
+      setShareFile(file);
+      return;
+
+
+    }
+  }
 
 
   return (
@@ -361,7 +371,11 @@ export function MyFiles() {
             open={selectedFile !== null}
             onClose={() => setSelectedFile(null)}
         />
-
+        <ShareDialog
+            file={shareFile}
+            open={shareFile !== null}
+            onClose={() => setShareFile(null)}
+        />
       </PageShell>
   );
 }
@@ -918,6 +932,7 @@ export function Trash() {
                 setPermanentDeleteFile(null)
             }
         />
+
 
       </PageShell>
   );
