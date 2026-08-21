@@ -23,8 +23,8 @@ import lombok.Setter;
 @Table(name = "users")
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter
 @Setter
+@Getter
 public class User {
     // Identity and authentication fields
     @Id
@@ -54,5 +54,6 @@ public class User {
     private LocalDateTime updatedAt;
     private LocalDateTime lastLoginAt;
     private LocalDateTime deletedAt;
+   
 
 }

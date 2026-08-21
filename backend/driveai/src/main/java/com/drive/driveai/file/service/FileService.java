@@ -1,0 +1,366 @@
+package com.drive.driveai.file.service;
+
+import java.io.InputStream;
+
+import java.util.Set;
+import java.util.UUID;
+
+import com.drive.driveai.exception.FileMetadataNotFoundException;
+import com.drive.driveai.file.dto.DownloadFileResponse;
+import com.drive.driveai.file.dto.FileResponse;
+import com.drive.driveai.file.dto.RenameFileRequest;
+import com.drive.driveai.security.CustomUserDetails;
+import io.minio.*;
+import jakarta.transaction.Transactional;
+
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.drive.driveai.exception.FileStorageException;
+import com.drive.driveai.exception.InvalidFileException;
+import com.drive.driveai.file.dto.UploadFileResponse;
+import com.drive.driveai.file.entity.FileMetadata;
+import com.drive.driveai.file.mapper.FileMapper;
+import com.drive.driveai.file.repository.FileRepository;
+import com.drive.driveai.user.entity.User;
+import com.drive.driveai.user.repository.UserRepository;
+
+
+@Service
+
+public class FileService {
+
+    private final MinioClient minioClient;
+    private final UserRepository userRepository;
+    private final FileMapper mapper;
+
+    private final FileRepository fileRepository;
+    public FileService(MinioClient minioClient, UserRepository userRepository, FileMapper mapper, FileRepository fileRepository) {
+        this.minioClient = minioClient;
+        this.userRepository = userRepository;
+        this.mapper = mapper;
+        this.fileRepository = fileRepository;
+    }
+
+    @Value("${app.file.max-size}")
+    private long maxFileSize;
+    @Value("${minio.bucket}")
+    private String bucket;
+    private static final Set<String> ALLOWED_CONTENT_TYPES = Set.of(
+            "image/png",
+            "image/jpeg",
+            "image/jpg",
+            "application/pdf");
+
+    public UploadFileResponse uploadFile(MultipartFile file, UUID userId) {
+        validateFile(file);
+        enusureBucketExists();
+        String storageKey = generateStorageKey(file, userId);
+
+        uploadTominio(file, storageKey);
+
+        User user = getUser(userId);
+
+        FileMetadata metadata = mapper.mapToEntity(
+
+                file.getOriginalFilename(),
+                file.getContentType(),
+                file.getSize(),
+                storageKey,
+                user);
+
+        metadata = fileRepository.save(metadata);
+        return mapper.mapToResponse(metadata);
+
+    }
+
+    private void validateFile(MultipartFile file) {
+        // null check
+        if (file == null) {
+            throw new InvalidFileException("No file provided.");
+        }
+
+        if (file.isEmpty())
+            throw new InvalidFileException("Uploaded file is empty.");
+
+        if (file.getSize() > maxFileSize) {
+            throw new InvalidFileException("File exceeds maximum allowed size.");
+        }
+
+        if (!ALLOWED_CONTENT_TYPES.contains(file.getContentType())) {
+            throw new InvalidFileException("Unsupported file type.");
+        }
+
+    }
+
+    private void enusureBucketExists() {
+
+        // check bucket
+        try {
+
+            boolean exists = minioClient.bucketExists(
+                    BucketExistsArgs.builder()
+                            .bucket(bucket)
+                            .build());
+            // bucket creation
+            if (!exists) {
+                minioClient.makeBucket(
+                        MakeBucketArgs
+                                .builder()
+                                .bucket(bucket)
+                                .build());
+            }
+        } catch (Exception e) {
+            throw new FileStorageException("Unable to create MinIo bucket", e);
+        }
+    }
+
+    private String generateStorageKey(MultipartFile file, UUID userId) {
+
+        String fileName = file.getOriginalFilename();
+
+        if (fileName == null || fileName.isBlank()) {
+            throw new InvalidFileException("Invalid file Name");
+        }
+
+
+        String storageKey = "users/"
+                + userId
+                + "/"
+                + UUID.randomUUID()
+                + "." + getExtension(fileName);
+
+        return storageKey;
+    }
+
+    private void uploadTominio(MultipartFile file, String storageKey) {
+        try (InputStream inputStream = file.getInputStream()) {
+
+            minioClient.putObject(
+                    PutObjectArgs.builder()
+                            .bucket(bucket)
+                            .object(storageKey)
+                            .stream(inputStream, file.getSize(), -1)
+                            .contentType(file.getContentType())
+                            .build());
+
+        } catch (Exception e) {
+
+            throw new FileStorageException("Unable store in minio", e);
+
+        }
+
+    }
+
+    private User getUser(UUID userId) {
+        User user = userRepository.findByIdAndDeletedAtIsNull(userId)
+                .orElseThrow(() -> new UsernameNotFoundException("User Not found"));
+        return user;
+    }
+
+    // download file
+    public DownloadFileResponse downloadFile(UUID fileId,UUID currentUserId){
+        FileMetadata fileMetadata = fileRepository
+                .findByIdAndDeletedAtIsNull(fileId)
+                .orElseThrow(()-> new FileMetadataNotFoundException("File Not Found with id:"+fileId));
+
+        if(!(fileMetadata.getUploadedBy().getId().equals(currentUserId))){
+            throw new AccessDeniedException("You are not authorized to access this file");
+
+        }
+
+        try {
+            InputStream inputStream= minioClient.getObject(
+                    GetObjectArgs.builder()
+                            .bucket(bucket)
+                            .object(fileMetadata.getStorageKey())
+                            .build()
+            );
+            return mapper.mapToDownloadFileResponse(inputStream,fileMetadata.getOriginalFileName(),fileMetadata.getContentType());
+        } catch (Exception e) {
+            throw  new FileStorageException("Unable to download file from MinIO.",e);
+        }
+
+
+
+    }
+
+    // delete file
+    @Transactional
+    public void deleteFile(UUID fileId, UUID currentUserId) {
+
+        FileMetadata metadata = fileRepository.findByIdAndDeletedAtIsNull(fileId)
+                .orElseThrow(()-> new FileMetadataNotFoundException("File not found"));
+
+        if(!metadata.getUploadedBy().getId().equals(currentUserId)){
+            throw  new AccessDeniedException("You are not authorized to access this file");
+        }
+        metadata.markAsDeleted();
+        fileRepository.save(metadata);
+    }
+
+    // List All files of user
+
+    public Page<FileResponse> getMyFiles(UUID currentUserId, Pageable pageable){
+        Page<FileMetadata> page = fileRepository.findByUploadedByIdAndDeletedAtIsNull(currentUserId,pageable);
+        return page.map(mapper::mapToFileResponse);
+    }
+
+
+    // rename file
+    @Transactional
+    public FileResponse renameFile(
+            UUID fileId,
+            UUID currentUserId,
+            RenameFileRequest request){
+        FileMetadata metadata = fileRepository.findByIdAndDeletedAtIsNull(fileId).orElseThrow(()-> new FileMetadataNotFoundException("File not found with id:"+fileId));
+
+
+        if(!metadata.getUploadedBy().getId().equals(currentUserId)){
+            throw new AccessDeniedException("You are not authorized to access this file");
+        }
+        if(metadata.getOriginalFileName().equals(request.getFileName())){
+            return mapper.mapToFileResponse(metadata);
+        }
+        String oldExtension = getExtension(metadata.getOriginalFileName());
+        String newExtension = getExtension(request.getFileName());
+        if(!oldExtension.equalsIgnoreCase(newExtension)){
+            throw new FileMetadataNotFoundException( "Changing the file extension is not allowed.");
+        }
+
+        metadata.setOriginalFileName(request.getFileName());
+        metadata= fileRepository.save(metadata);
+        return mapper.mapToFileResponse(metadata);
+    }
+    private String getExtension(String fileName) {
+        int index = fileName.lastIndexOf('.');
+        if (index == -1) {
+            throw new InvalidFileException("File has no extension");
+        }
+
+        return fileName.substring(index + 1);
+    }
+
+    // trash files
+    public Page<FileResponse> getTrashFiles(CustomUserDetails userDetails, Pageable pageable) {
+        System.out.println("🔥 TRASH ENDPOINT HIT");
+        User user = userDetails.getUser();
+
+        Page<FileMetadata> files = fileRepository.findByUploadedByAndDeletedAtIsNotNull(user,pageable);
+
+        return files.map(mapper::mapToFileResponse);
+
+    }
+    // restore file
+    public void restoreFile(UUID fileId,UUID currentUserId) {
+
+        FileMetadata metadata = fileRepository.findByIdAndDeletedAtIsNotNull(fileId)
+                .orElseThrow(()->  new FileMetadataNotFoundException("File not found in trash"));
+
+        if(!metadata.getUploadedBy().getId().equals(currentUserId)){
+            throw  new AccessDeniedException("You are not authorized to restore this file");
+
+        }
+        metadata.setDeletedAt(null);
+        fileRepository.save(metadata);
+    }
+
+    // search file
+    public Page<FileResponse> searchFiles(UUID currentUserId,String searchText,Pageable pageable){
+
+        User user = getUser(currentUserId);
+        Page<FileMetadata> files = fileRepository.findByUploadedByAndOriginalFileNameContainingIgnoreCaseAndDeletedAtIsNull(user,searchText,pageable);
+
+        return files.map(mapper::mapToFileResponse);
+    }
+    @Transactional
+    public void permanentlyDeleteFile(UUID fileId,UUID currentUserId) {
+        FileMetadata metadata = fileRepository.findByIdAndDeletedAtIsNotNull(fileId)
+                .orElseThrow(()-> new FileMetadataNotFoundException("File not found"));
+
+        if(!metadata.getUploadedBy().getId().equals(currentUserId)){
+            throw  new AccessDeniedException("You are not authorized to access this file");
+        }
+
+        try {
+            minioClient.removeObject(
+
+                    RemoveObjectArgs.builder()
+                            .bucket(bucket)
+                            .object(metadata.getStorageKey())
+                            .build());
+        } catch (Exception e){
+            throw new FileStorageException("Error while deleting file",e);
+        }
+
+        fileRepository.delete(metadata);
+    }
+
+
+
+    // favorite file
+//    public void favoriteFile(UUID fileId, UUID id) {
+//        FileMetadata metadata = fileRepository.findByIdAndDeletedAtIsNull(fileId).orElseThrow(()-> new FileMetadataNotFoundException("File not found with id:"+fileId));
+//        if(!metadata.getUploadedBy().getId().equals(id)){
+//            throw new AccessDeniedException("You are not authorized to access this file");
+//        }
+//
+//        metadata.setFavorite(true);
+//        fileRepository.save(metadata);
+//
+//    }
+    public void favoriteFile(UUID fileId, UUID currentUserId) {
+
+        FileMetadata metadata = fileRepository
+                .findByIdAndDeletedAtIsNull(fileId)
+                .orElseThrow(() ->
+                        new FileMetadataNotFoundException(
+                                "File not found with id: " + fileId
+                        ));
+
+        System.out.println("========== FAVORITE DEBUG ==========");
+        System.out.println("File ID       : " + fileId);
+        System.out.println("File owner ID : " + metadata.getUploadedBy().getId());
+        System.out.println("Current user  : " + currentUserId);
+        System.out.println("====================================");
+
+        if (!metadata.getUploadedBy().getId().equals(currentUserId)) {
+            throw new AccessDeniedException(
+                    "You are not authorized to access this file"
+            );
+        }
+
+        metadata.setFavorite(true);
+        fileRepository.save(metadata);
+    }
+    // unFavoriteFile
+    public void unFavoriteFile(UUID fileId, UUID id) {
+        FileMetadata metadata = fileRepository.findByIdAndDeletedAtIsNull(fileId).orElseThrow(()-> new FileMetadataNotFoundException("File not found with id:"+fileId));
+        if(!metadata.getUploadedBy().getId().equals(id)){
+            throw new AccessDeniedException("You are not authorized to access this file");
+        }
+
+        metadata.setFavorite(false);
+        fileRepository.save(metadata);
+
+    }
+
+
+    public Page<FileResponse> getFavoriteFiles(User user,Pageable pageable) {
+        Page<FileMetadata> metadata = fileRepository.findByUploadedByAndIsFavoriteTrueAndDeletedAtIsNull(user,pageable);
+        return metadata.map(mapper::mapToFileResponse);
+    }
+
+    public Page<FileResponse> getRecentFiles(User user, Pageable pageable) {
+
+        Page<FileMetadata> metadata = fileRepository.findByUploadedByAndDeletedAtIsNullOrderByCreatedAtDesc(user,pageable);
+
+        return metadata.map(mapper::mapToFileResponse);
+    }
+}
