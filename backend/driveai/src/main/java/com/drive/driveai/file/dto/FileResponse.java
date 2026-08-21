@@ -21,5 +21,6 @@ public class FileResponse extends BaseEntity {
     private FileStatus status;
 
     private LocalDateTime uploadedAt;
+    private boolean isFavorite;
 
 }

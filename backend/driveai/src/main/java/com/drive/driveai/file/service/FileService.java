@@ -313,4 +313,64 @@ public class FileService {
     }
 
 
+
+    // favorite file
+//    public void favoriteFile(UUID fileId, UUID id) {
+//        FileMetadata metadata = fileRepository.findByIdAndDeletedAtIsNull(fileId).orElseThrow(()-> new FileMetadataNotFoundException("File not found with id:"+fileId));
+//        if(!metadata.getUploadedBy().getId().equals(id)){
+//            throw new AccessDeniedException("You are not authorized to access this file");
+//        }
+//
+//        metadata.setFavorite(true);
+//        fileRepository.save(metadata);
+//
+//    }
+    public void favoriteFile(UUID fileId, UUID currentUserId) {
+
+        FileMetadata metadata = fileRepository
+                .findByIdAndDeletedAtIsNull(fileId)
+                .orElseThrow(() ->
+                        new FileMetadataNotFoundException(
+                                "File not found with id: " + fileId
+                        ));
+
+        System.out.println("========== FAVORITE DEBUG ==========");
+        System.out.println("File ID       : " + fileId);
+        System.out.println("File owner ID : " + metadata.getUploadedBy().getId());
+        System.out.println("Current user  : " + currentUserId);
+        System.out.println("====================================");
+
+        if (!metadata.getUploadedBy().getId().equals(currentUserId)) {
+            throw new AccessDeniedException(
+                    "You are not authorized to access this file"
+            );
+        }
+
+        metadata.setFavorite(true);
+        fileRepository.save(metadata);
+    }
+    // unFavoriteFile
+    public void unFavoriteFile(UUID fileId, UUID id) {
+        FileMetadata metadata = fileRepository.findByIdAndDeletedAtIsNull(fileId).orElseThrow(()-> new FileMetadataNotFoundException("File not found with id:"+fileId));
+        if(!metadata.getUploadedBy().getId().equals(id)){
+            throw new AccessDeniedException("You are not authorized to access this file");
+        }
+
+        metadata.setFavorite(false);
+        fileRepository.save(metadata);
+
+    }
+
+
+    public Page<FileResponse> getFavoriteFiles(User user,Pageable pageable) {
+        Page<FileMetadata> metadata = fileRepository.findByUploadedByAndIsFavoriteTrueAndDeletedAtIsNull(user,pageable);
+        return metadata.map(mapper::mapToFileResponse);
+    }
+
+    public Page<FileResponse> getRecentFiles(User user, Pageable pageable) {
+
+        Page<FileMetadata> metadata = fileRepository.findByUploadedByAndDeletedAtIsNullOrderByCreatedAtDesc(user,pageable);
+
+        return metadata.map(mapper::mapToFileResponse);
+    }
 }

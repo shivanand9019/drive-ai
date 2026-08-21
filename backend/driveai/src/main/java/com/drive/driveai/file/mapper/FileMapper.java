@@ -58,6 +58,7 @@ public class FileMapper {
        response.setContentType(metadata.getContentType());
        response.setStatus(metadata.getStatus());
        response.setUploadedAt(metadata.getCreatedAt());
+       response.setFavorite(metadata.isFavorite());
        return response;
 
 

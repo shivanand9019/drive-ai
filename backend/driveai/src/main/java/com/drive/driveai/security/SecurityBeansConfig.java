@@ -1,5 +1,6 @@
 package com.drive.driveai.security;
 
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -9,6 +10,7 @@ import org.springframework.security.config.annotation.authentication.configurati
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 
 @Configuration
@@ -40,6 +42,17 @@ public class SecurityBeansConfig {
     AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
         return configuration.getAuthenticationManager();
 
+    }
+    @Bean
+    CommandLineRunner printMappings(RequestMappingHandlerMapping mapping) {
+        return args -> {
+            mapping.getHandlerMethods().forEach((key, value) -> {
+                if (key.toString().contains("favorite")
+                        || key.toString().contains("FileController")) {
+                    System.out.println("MAPPING: " + key + " -> " + value);
+                }
+            });
+        };
     }
     
 }
