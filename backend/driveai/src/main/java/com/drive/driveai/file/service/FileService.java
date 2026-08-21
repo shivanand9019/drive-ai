@@ -356,4 +356,11 @@ public class FileService {
         Page<FileMetadata> metadata = fileRepository.findByUploadedByAndIsFavoriteTrueAndDeletedAtIsNull(user,pageable);
         return metadata.map(mapper::mapToFileResponse);
     }
+
+    public Page<FileResponse> getRecentFiles(User user, Pageable pageable) {
+
+        Page<FileMetadata> metadata = fileRepository.findByUploadedByAndDeletedAtIsNullOrderByCreatedAtDesc(user,pageable);
+
+        return metadata.map(mapper::mapToFileResponse);
+    }
 }

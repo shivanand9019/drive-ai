@@ -12,7 +12,6 @@ import org.springframework.stereotype.Repository;
 
 import com.drive.driveai.file.entity.FileMetadata;
 import com.drive.driveai.user.entity.User;
-import org.springframework.web.service.invoker.HttpRequestValues;
 
 @Repository
 public interface FileRepository extends JpaRepository<FileMetadata,UUID>{
@@ -32,4 +31,7 @@ public interface FileRepository extends JpaRepository<FileMetadata,UUID>{
 
     Page<FileMetadata> findByUploadedByAndOriginalFileNameContainingIgnoreCaseAndDeletedAtIsNull(User uploadedBy,String searchText,Pageable pageable);
     Page<FileMetadata>findByUploadedByAndIsFavoriteTrueAndDeletedAtIsNull(User user,Pageable pageable);
+
+    Page<FileMetadata> findByUploadedByAndDeletedAtIsNullOrderByCreatedAtDesc(User user,Pageable pageable);
+
 }

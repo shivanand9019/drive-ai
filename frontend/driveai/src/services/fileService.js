@@ -2,6 +2,7 @@
 
 import api from "@/apis/axios.jsx";
 
+
 export async function getFiles() {
 
   const response = await api.get("/files");
@@ -128,7 +129,22 @@ export  async  function unFavoriteFile(fileId){
 
 export async function  getFavoriteFiles(page=0,size=20){
   try{
-    const response = await api.get("/files/favorites");
+    const response = await api.get("/files/favorites",{
+      params:{size,page}
+    });
+    return response.data;
+  }catch (error){
+    console.error(error);
+    throw error;
+  }
+}
+export async function  getRecentFiles(page=0,size=20){
+  try{
+    const response = await api.get("/files/recent",{
+      param:{
+        size,page
+      }
+    });
     return response.data;
   }catch (error){
     console.error(error);
@@ -194,6 +210,7 @@ export const fileService = {
   favoriteFile,
   unFavoriteFile,
   getFavoriteFiles,
+  getRecentFiles,
 
   shareFile,
   getSharedFiles,
