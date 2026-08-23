@@ -696,7 +696,6 @@ export function Favorites() {
 
   // RECENT
 
-
 export function Recent() {
   const [files, setFiles] = useState([]);
   const [loading, setLoading] = useState(false);

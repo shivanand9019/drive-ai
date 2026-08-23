@@ -27,7 +27,30 @@ services:
     networks:
       - mynetwork
     restart: unless-stopped
+  backend:
+    image: driveai-backend:latest
+    ports:
+      - "8080:8080"
+    environment:
+      DB_URL: jdbc:postgresql://postgres:5432/driveai
+      DB_USERNAME: ${POSTGRES_USER}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
 
+      MINIO_ENDPOINT: http://minio:9000
+      MINIO_ACCESS_KEY: ${MINIO_ROOT_USER}
+      MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD}
+      MINIO_BUCKET: driveai-files
+
+      JWT_SECRET: ${JWT_SECRET}
+
+    networks:
+      - mynetwork
+
+    depends_on:
+      - postgres
+      - minio
+
+    restart: unless-stopped
 volumes:
   db_data:
   minio_data:
