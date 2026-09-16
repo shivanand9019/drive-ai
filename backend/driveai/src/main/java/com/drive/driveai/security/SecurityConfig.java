@@ -39,8 +39,8 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth-> auth
                         .requestMatchers("/auth/**").permitAll()
                     .requestMatchers(HttpMethod.OPTIONS,"/**").permitAll()
-
-
+                .requestMatchers("/v3/api-docs","/v3/api-docs/**","/error",
+                "/swagger-ui/**", "/swagger-ui.html").permitAll()
                         .anyRequest().authenticated()
 
              )
@@ -57,7 +57,9 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
 
         configuration.setAllowedOrigins(
-                List.of("http://localhost:5173")
+                List.of("http://localhost:5173",
+                        "https://drive-ai-azure.vercel.app"
+                )
         );
 
         configuration.setAllowedMethods(

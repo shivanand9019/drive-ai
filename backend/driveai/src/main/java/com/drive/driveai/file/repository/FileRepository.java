@@ -1,6 +1,7 @@
 package com.drive.driveai.file.repository;
 
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import java.util.UUID;
@@ -11,6 +12,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import com.drive.driveai.file.entity.FileMetadata;
+import com.drive.driveai.file.enums.FileStatus;
 import com.drive.driveai.user.entity.User;
 
 @Repository
@@ -33,5 +35,12 @@ public interface FileRepository extends JpaRepository<FileMetadata,UUID>{
     Page<FileMetadata>findByUploadedByAndIsFavoriteTrueAndDeletedAtIsNull(User user,Pageable pageable);
 
     Page<FileMetadata> findByUploadedByAndDeletedAtIsNullOrderByCreatedAtDesc(User user,Pageable pageable);
+    
+    // dashboard related queries
+    long countByUploadedByAndDeletedAtIsNullAndCreatedAtGreaterThanEqual(User user, LocalDateTime startOfMonth);
+    long countByUploadedByAndDeletedAtIsNull(User user);
+    long countByUploadedByAndDeletedAtIsNullAndStatus(User user,FileStatus status);
+
+
 
 }

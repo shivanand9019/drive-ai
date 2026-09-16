@@ -23,7 +23,6 @@ import com.drive.driveai.file.dto.UploadFileResponse;
 import com.drive.driveai.file.service.FileService;
 import com.drive.driveai.security.CustomUserDetails;
 
-
 import lombok.RequiredArgsConstructor;
 
 
@@ -31,6 +30,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/files")
 @RequiredArgsConstructor
+
 public class FileController {
 
     private final FileService fileService;

@@ -19,29 +19,31 @@ export default function HeroSection() {
           <div className="text-center lg:text-left">
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/80 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 shadow-soft backdrop-blur animate-fade-in">
               <Sparkles className="h-3.5 w-3.5 text-primary-600" />
-              <span className="text-xs font-medium text-slate-700 dark:text-slate-300">AI-first cloud storage, reimagined</span>
+              <span className="text-xs font-medium text-slate-700 dark:text-slate-300">Student Engineering Project · Cloud & Systems</span>
             </div>
 
             <h1 className="mt-6 text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-slate-900 dark:text-white leading-[1.05] animate-fade-in-up">
-              AI-Powered <span className="text-gradient">Cloud Storage</span>
+              Cloud Storage <span className="text-gradient">Engineered with AI</span>
             </h1>
 
-            <p className="mt-6 text-lg text-slate-600 dark:text-slate-300 max-w-xl mx-auto lg:mx-0 animate-fade-in-up" style={{ animationDelay: '100ms' }}>
-              Upload, organize and intelligently manage your files with AI-powered search, analysis and secure cloud storage.
+            <p className="mt-6 text-base sm:text-lg text-slate-600 dark:text-slate-300 max-w-xl mx-auto lg:mx-0 animate-fade-in-up" style={{ animationDelay: '100ms' }}>
+              A full-stack, cloud-native storage platform built from scratch with Spring Boot 3, PostgreSQL, MinIO (S3-compatible), and React to explore secure distributed file storage and AI workflows.
             </p>
 
             <div className="mt-8 flex flex-col sm:flex-row items-center gap-3 justify-center lg:justify-start animate-fade-in-up" style={{ animationDelay: '200ms' }}>
               <Link to="/register">
-                <Button variant="gradient" size="lg" rightIcon={ArrowRight} className="w-full sm:w-auto">Get Started</Button>
+                <Button variant="gradient" size="lg" rightIcon={ArrowRight} className="w-full sm:w-auto">Try Live Demo</Button>
               </Link>
-              <a href="#demo">
-                <Button variant="secondary" size="lg" leftIcon={Play} className="w-full sm:w-auto">Live Demo</Button>
+              <a href="#features">
+                <Button variant="secondary" size="lg" className="w-full sm:w-auto">Explore Features</Button>
               </a>
             </div>
 
-            <div className="mt-10 flex items-center gap-6 justify-center lg:justify-start text-sm text-slate-500 animate-fade-in-up" style={{ animationDelay: '300ms' }}>
-              <div className="flex items-center gap-2"><ShieldCheck className="h-4 w-4 text-emerald-500" /> SOC 2 Type II</div>
-              <div className="flex items-center gap-2"><Zap className="h-4 w-4 text-amber-500" /> 99.9% Uptime</div>
+            <div className="mt-10 flex flex-wrap items-center gap-2 justify-center lg:justify-start text-xs text-slate-500 animate-fade-in-up" style={{ animationDelay: '300ms' }}>
+              <span className="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 font-mono text-slate-700 dark:text-slate-300">Java 21 · Spring Boot</span>
+              <span className="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 font-mono text-slate-700 dark:text-slate-300">PostgreSQL (Neon)</span>
+              <span className="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 font-mono text-slate-700 dark:text-slate-300">MinIO S3</span>
+              <span className="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 font-mono text-slate-700 dark:text-slate-300">Docker & React</span>
             </div>
           </div>
 
@@ -64,64 +66,67 @@ function DashboardIllustration() {
           <div className="h-3 w-3 rounded-full bg-rose-400" />
           <div className="h-3 w-3 rounded-full bg-amber-400" />
           <div className="h-3 w-3 rounded-full bg-emerald-400" />
-          <div className="ml-3 text-xs text-slate-400">driveai.app/dashboard</div>
+          <div className="ml-3 text-xs text-slate-400 font-mono">driveai.vercel.app/dashboard</div>
         </div>
 
         <div className="grid grid-cols-3 gap-3">
           <div className="col-span-2 rounded-2xl bg-gradient-to-br from-primary-500 to-secondary-500 p-4 text-white">
             <div className="flex items-center gap-2">
               <Sparkles className="h-4 w-4" />
-              <span className="text-xs font-medium">AI Summary</span>
+              <span className="text-xs font-semibold">DriveAI Architecture</span>
             </div>
-            <div className="mt-3 space-y-2">
-              <div className="h-2 w-full rounded bg-white/30" />
-              <div className="h-2 w-4/5 rounded bg-white/30" />
-              <div className="h-2 w-3/5 rounded bg-white/30" />
+            <div className="mt-2.5 space-y-1.5 text-[11px] text-white/90">
+              <div>✓ Spring Security + Stateless JWT</div>
+              <div>✓ MinIO S3 Binary Stream Uploads</div>
+              <div>✓ Soft-Delete & Trash Recovery</div>
+              <div>✓ Live Stats Aggregation API</div>
             </div>
           </div>
-          <div className="rounded-2xl bg-slate-100 dark:bg-slate-800 p-4">
-            <div className="text-xs text-slate-500">Storage</div>
-            <div className="mt-2 h-16 rounded-xl bg-gradient-to-t from-primary-500 to-secondary-500" />
-            <div className="mt-2 text-xs text-slate-500">68.4 / 100 GB</div>
+          <div className="rounded-2xl bg-slate-100 dark:bg-slate-800 p-4 flex flex-col justify-between">
+            <div>
+              <div className="text-[11px] text-slate-500 font-medium">Deployment</div>
+              <div className="mt-1 text-xs font-semibold text-slate-800 dark:text-slate-200">Cloud Native</div>
+            </div>
+            <div className="text-[10px] text-slate-400">Neon + Render + Vercel</div>
           </div>
         </div>
 
         <div className="mt-3 grid grid-cols-4 gap-3">
           {[
-            { l: 'Docs', v: '1,284', c: 'text-primary-600' },
-            { l: 'OCR', v: '942', c: 'text-secondary-600' },
-            { l: 'Dupes', v: '37', c: 'text-rose-600' },
-            { l: 'Images', v: '3.5k', c: 'text-violet-600' },
+            { l: 'Auth', v: 'JWT', c: 'text-primary-600' },
+            { l: 'Storage', v: 'MinIO', c: 'text-secondary-600' },
+            { l: 'DB', v: 'Neon PG', c: 'text-emerald-600' },
+            { l: 'Docs', v: 'Swagger', c: 'text-violet-600' },
           ].map((s) => (
-            <div key={s.l} className="rounded-xl bg-slate-50 dark:bg-slate-800/50 p-3">
-              <div className={`text-base font-bold ${s.c}`}>{s.v}</div>
-              <div className="text-[11px] text-slate-400">{s.l}</div>
+            <div key={s.l} className="rounded-xl bg-slate-50 dark:bg-slate-800/50 p-3 text-center">
+              <div className={`text-sm font-bold ${s.c}`}>{s.v}</div>
+              <div className="text-[10px] text-slate-400">{s.l}</div>
             </div>
           ))}
         </div>
       </div>
 
       {/* Floating cards */}
-      <div className="absolute -top-6 -left-8 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-float p-3 w-44 animate-float" style={{ animationDelay: '1s' }}>
+      <div className="absolute -top-6 -left-8 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-float p-3 w-48 animate-float" style={{ animationDelay: '1s' }}>
         <div className="flex items-center gap-2">
           <div className="h-8 w-8 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 grid place-items-center">
             <FileText className="h-4 w-4 text-emerald-600" />
           </div>
           <div>
-            <div className="text-xs font-semibold text-slate-800 dark:text-white">OCR Complete</div>
-            <div className="text-[10px] text-slate-400">Invoice_Q3.pdf</div>
+            <div className="text-xs font-semibold text-slate-800 dark:text-white">Live Storage Service</div>
+            <div className="text-[10px] text-slate-400">MinIO S3 Buckets</div>
           </div>
         </div>
       </div>
 
       <div className="absolute -bottom-6 -right-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-float p-3 w-48 animate-float" style={{ animationDelay: '2.5s' }}>
         <div className="flex items-center gap-2">
-          <div className="h-8 w-8 rounded-lg bg-violet-50 dark:bg-violet-950/40 grid place-items-center">
-            <ImageIcon className="h-4 w-4 text-violet-600" />
+          <div className="h-8 w-8 rounded-lg bg-primary-50 dark:bg-primary-950/40 grid place-items-center">
+            <Sparkles className="h-4 w-4 text-primary-600" />
           </div>
           <div>
-            <div className="text-xs font-semibold text-slate-800 dark:text-white">Image Classified</div>
-            <div className="text-[10px] text-slate-400">"Team meeting" · 12 tags</div>
+            <div className="text-xs font-semibold text-slate-800 dark:text-white">AI Engine (Roadmap)</div>
+            <div className="text-[10px] text-slate-400">Async PDF Summarization</div>
           </div>
         </div>
       </div>

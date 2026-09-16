@@ -20,8 +20,10 @@ import org.springframework.web.bind.annotation.RestController;
 import com.drive.driveai.security.CustomUserDetails;
 import com.drive.driveai.user.dto.CurrentUserResponse;
 import com.drive.driveai.user.service.UserService;
+
 @RestController
 @RequestMapping("/users")
+
 public class UserController {
     
     private final UserService userService;

@@ -8,7 +8,9 @@ import {
   Trash2,
   Settings,
   Upload as UploadIcon,
-  Sparkles
+  Sparkles,
+  Bell,
+  User as UserIcon
 } from 'lucide-react';
 
 import FileTable from '@/components/FileTable';
@@ -17,7 +19,6 @@ import UploadZone from '@/components/UploadZone';
 import EmptyState from '@/components/EmptyState';
 import LoadingSkeleton from '@/components/LoadingSkeleton';
 import AIInsightsCard from '@/components/AIInsightsCard';
-import StorageCard from '@/components/StorageCard';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import { fileService } from '@/services/fileService';
 import Button from "@/components/Button.jsx";
@@ -416,65 +417,53 @@ export function AIInsights() {
 
           <AIInsightsCard />
 
-          <div className="grid lg:grid-cols-3 gap-6">
+          <div>
+            <Card>
 
-            <div className="lg:col-span-1">
-              <StorageCard
-                  used={68.4}
-                  limit={100}
-                  filesCount={1284}
-              />
-            </div>
+              <h3 className="text-sm font-semibold text-slate-800 dark:text-white mb-3">
+                Recent AI Activity
+              </h3>
 
-            <div className="lg:col-span-2">
+              <div className="space-y-3">
 
-              <Card>
+                {[
+                  // Backend AI activity stream API not implemented yet - placeholder demo activity
+                  ['Summarized Q3 Financial Report.pdf', '2 min ago', 'primary'],
+                  ['OCR completed on Invoice_481.pdf', '12 min ago', 'secondary'],
+                  ['Detected 2 duplicate files', '1 hour ago', 'rose'],
+                  ['Classified 14 images by content', '3 hours ago', 'violet'],
+                ].map(([text, time, color], i) => (
 
-                <h3 className="text-sm font-semibold text-slate-800 dark:text-white mb-3">
-                  Recent AI Activity
-                </h3>
-
-                <div className="space-y-3">
-
-                  {[
-                    ['Summarized Q3 Financial Report.pdf', '2 min ago', 'primary'],
-                    ['OCR completed on Invoice_481.pdf', '12 min ago', 'secondary'],
-                    ['Detected 2 duplicate files', '1 hour ago', 'rose'],
-                    ['Classified 14 images by content', '3 hours ago', 'violet'],
-                  ].map(([text, time, color], i) => (
+                    <div
+                        key={i}
+                        className="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors"
+                    >
 
                       <div
-                          key={i}
-                          className="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors"
+                          className={`h-8 w-8 rounded-lg grid place-items-center ${accentBg(color)}`}
                       >
+                        <Sparkles className="h-4 w-4 text-white" />
+                      </div>
 
-                        <div
-                            className={`h-8 w-8 rounded-lg grid place-items-center ${accentBg(color)}`}
-                        >
-                          <Sparkles className="h-4 w-4 text-white" />
-                        </div>
+                      <div className="flex-1 min-w-0">
 
-                        <div className="flex-1 min-w-0">
+                        <p className="text-sm text-slate-700 dark:text-slate-200 truncate">
+                          {text}
+                        </p>
 
-                          <p className="text-sm text-slate-700 dark:text-slate-200 truncate">
-                            {text}
-                          </p>
-
-                          <p className="text-xs text-slate-400">
-                            {time}
-                          </p>
-
-                        </div>
+                        <p className="text-xs text-slate-400">
+                          {time}
+                        </p>
 
                       </div>
 
-                  ))}
+                    </div>
 
-                </div>
+                ))}
 
-              </Card>
+              </div>
 
-            </div>
+            </Card>
 
           </div>
 
@@ -983,90 +972,175 @@ export function Trash() {
 ========================================================= */
 
 export function SettingsPage() {
+  const { user } = useOutletContext();
+  const [fullName, setFullName] = useState(user?.fullName || '');
+  const [saved, setSaved] = useState(false);
+
+  useEffect(() => {
+    if (user?.fullName) {
+      setFullName(user.fullName);
+    }
+  }, [user]);
+
+  const handleSaveProfile = (e) => {
+    e.preventDefault();
+    // Backend profile update API (e.g., PUT /api/v1/users/me) is not implemented yet.
+    // Keeping updated state locally and showing visual feedback.
+    setSaved(true);
+    setTimeout(() => setSaved(false), 3000);
+  };
 
   return (
       <PageShell
           title="Settings"
-          subtitle="Manage your preferences"
+          subtitle="Manage your profile and preferences"
           icon={Settings}
       >
 
-        <div className="grid lg:grid-cols-3 gap-6">
+        <div className="max-w-4xl space-y-6">
 
-          <div className="lg:col-span-2 space-y-6">
+          {/* Profile Card */}
+          <Card>
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2.5">
+                <div className="h-9 w-9 rounded-xl bg-primary-50 dark:bg-primary-950/50 text-primary-600 dark:text-primary-400 grid place-items-center">
+                  <UserIcon className="h-5 w-5" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-semibold text-slate-800 dark:text-white">
+                    Profile Information
+                  </h3>
+                  <p className="text-xs text-slate-500">
+                    Your account details and role
+                  </p>
+                </div>
+              </div>
+              <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-primary-100 dark:bg-primary-900/40 text-primary-700 dark:text-primary-300">
+                {user?.role || 'USER'}
+              </span>
+            </div>
 
-            <Card>
+            <form onSubmit={handleSaveProfile} className="space-y-4">
+              <div className="grid sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1.5">
+                    Full name
+                  </label>
+                  <input
+                      type="text"
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
+                      placeholder="Your name"
+                      className="w-full h-11 px-3.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-primary-500/40 focus:border-primary-400"
+                  />
+                </div>
 
-              <h3 className="text-sm font-semibold text-slate-800 dark:text-white">
-                Profile
-              </h3>
-
-              <div className="mt-4 grid sm:grid-cols-2 gap-4">
-
-                <Input
-                    label="Full name"
-                    defaultValue="Alex Morgan"
-                />
-
-                <Input
-                    label="Email"
-                    defaultValue="alex@driveai.app"
-                />
-
+                <div>
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1.5">
+                    Email Address
+                  </label>
+                  <input
+                      type="email"
+                      value={user?.email || ''}
+                      disabled
+                      title="Email is fixed to your account credentials"
+                      className="w-full h-11 px-3.5 rounded-xl bg-slate-100 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-sm text-slate-500 dark:text-slate-400 cursor-not-allowed"
+                  />
+                </div>
               </div>
 
-              <div className="mt-4">
-                <Button>
+              <div className="flex items-center gap-3 pt-2">
+                <Button type="submit">
                   Save changes
                 </Button>
+                {saved && (
+                    <span className="text-xs font-medium text-emerald-600 dark:text-emerald-400">
+                    Profile saved! (Local state)
+                  </span>
+                )}
               </div>
+            </form>
+          </Card>
 
-            </Card>
-
-
-            <Card>
-
-              <h3 className="text-sm font-semibold text-slate-800 dark:text-white">
-                AI Preferences
-              </h3>
-
-              <div className="mt-4 space-y-3">
-
-                <Toggle
-                    label="Auto-summarize uploaded documents"
-                    defaultOn
-                />
-
-                <Toggle
-                    label="Run OCR on images and scanned PDFs"
-                    defaultOn
-                />
-
-                <Toggle
-                    label="Detect duplicate files automatically"
-                    defaultOn
-                />
-
-                <Toggle
-                    label="Classify images with AI vision"
-                />
-
+          {/* Notification Preferences Card */}
+          <Card>
+            <div className="flex items-center gap-2.5 mb-4">
+              <div className="h-9 w-9 rounded-xl bg-violet-50 dark:bg-violet-950/50 text-violet-600 dark:text-violet-400 grid place-items-center">
+                <Bell className="h-5 w-5" />
               </div>
+              <div>
+                <h3 className="text-sm font-semibold text-slate-800 dark:text-white">
+                  Notifications
+                </h3>
+                <p className="text-xs text-slate-500">
+                  Manage notification triggers (Backend API pending)
+                </p>
+              </div>
+            </div>
 
-            </Card>
+            <div className="space-y-3 divide-y divide-slate-100 dark:divide-slate-800">
+              {/* Backend notification preferences API not implemented yet - defaulting toggles to enabled with local state */}
+              <Toggle
+                  label="Email notification when someone shares a file with you"
+                  defaultOn
+              />
 
-          </div>
+              <Toggle
+                  label="Alert when AI document analysis completes"
+                  defaultOn
+              />
 
+              <Toggle
+                  label="Security alert on login from a new device"
+                  defaultOn
+              />
 
-          <div>
+              <Toggle
+                  label="Weekly digest of document activities"
+                  defaultOn={false}
+              />
+            </div>
+          </Card>
 
-            <StorageCard
-                used={68.4}
-                limit={100}
-                filesCount={1284}
-            />
+          {/* AI Preferences Card */}
+          <Card>
+            <div className="flex items-center gap-2.5 mb-4">
+              <div className="h-9 w-9 rounded-xl bg-secondary-50 dark:bg-secondary-950/50 text-secondary-600 dark:text-secondary-400 grid place-items-center">
+                <Sparkles className="h-5 w-5" />
+              </div>
+              <div>
+                <h3 className="text-sm font-semibold text-slate-800 dark:text-white">
+                  AI Processing Preferences
+                </h3>
+                <p className="text-xs text-slate-500">
+                  Configure document intelligence automation (Backend API pending)
+                </p>
+              </div>
+            </div>
 
-          </div>
+            <div className="space-y-3 divide-y divide-slate-100 dark:divide-slate-800">
+              {/* Backend AI preferences API not implemented yet - defaulting toggles to enabled with local state */}
+              <Toggle
+                  label="Auto-summarize uploaded PDF documents"
+                  defaultOn
+              />
+
+              <Toggle
+                  label="Run OCR on scanned documents and images"
+                  defaultOn
+              />
+
+              <Toggle
+                  label="Detect duplicate files on upload"
+                  defaultOn
+              />
+
+              <Toggle
+                  label="Extract key action items and entities"
+                  defaultOn={false}
+              />
+            </div>
+          </Card>
 
         </div>
 
