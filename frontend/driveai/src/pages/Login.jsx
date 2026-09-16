@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Mail, Lock, Eye, EyeOff, ArrowRight, Check } from 'lucide-react';
 import Logo from '@/components/Logo';
 import Button from '@/components/Button';
@@ -7,10 +7,13 @@ import { authService } from '@/services/authService';
 
 export default function Login() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [form, setForm] = useState({ email: '', password: '', remember: true });
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
+
+  const successMessage = location.state?.message;
 
   const validate = () => {
     const e = {};
@@ -56,9 +59,15 @@ export default function Login() {
     <AuthShell>
       <div className="text-center">
         <Link to="/" className="inline-block"><Logo /></Link>
-        <h1 className="mt-6 text-2xl font-bold text-slate-900 dark:text-white">Welcome back</h1>
-        <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">Sign in to your DriveAI account</p>
+        <h1 className="mt-6 text-2xl font-bold text-slate-900 dark:text-white">Sign In</h1>
+        <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">Enter your credentials to access your account</p>
       </div>
+
+      {successMessage && (
+        <div className="mt-4 p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900 text-xs text-emerald-700 dark:text-emerald-300 text-center font-medium">
+          {successMessage}
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} className="mt-8 space-y-5">
         <Field
@@ -66,11 +75,11 @@ export default function Login() {
           icon={Mail}
           error={errors.email}
           inputProps={{
-              name:"email",
+            name: "email",
             type: 'email',
-            placeholder: 'you@company.com',
+            placeholder: 'you@example.com',
             value: form.email,
-            onChange:handleChange
+            onChange: handleChange
           }}
         />
 
@@ -90,11 +99,11 @@ export default function Login() {
               </button>
             }
             inputProps={{
-                name:"password",
+              name: "password",
               type: showPassword ? 'text' : 'password',
               placeholder: '••••••••',
               value: form.password,
-              onChange:handleChange
+              onChange: handleChange
             }}
           />
           <div className="mt-3 flex items-center justify-between">
@@ -102,7 +111,6 @@ export default function Login() {
               <Checkbox checked={form.remember} onChange={(v) => setForm({ ...form, remember: v })} />
               Remember me
             </label>
-            <a href="#" className="text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline">Forgot password?</a>
           </div>
         </div>
 
@@ -111,21 +119,9 @@ export default function Login() {
         </Button>
       </form>
 
-      <Divider />
-
-      <Button
-        variant="secondary"
-        size="lg"
-        className="w-full"
-        onClick={() => { /* TODO: authService.loginWithGoogle() */ authService.loginWithGoogle().then(() => navigate('/dashboard')); }}
-        leftIcon={() => <GoogleIcon />}
-      >
-        Continue with Google
-      </Button>
-
-      <p className="mt-8 text-center text-sm text-slate-500 dark:text-slate-400">
+      <p className="mt-6 text-center text-sm text-slate-500 dark:text-slate-400">
         Don&apos;t have an account?{' '}
-        <Link to="/register" className="font-semibold text-primary-600 dark:text-primary-400 hover:underline">Create one</Link>
+        <Link to="/register" className="font-semibold text-primary-600 dark:text-primary-400 hover:underline">Sign up</Link>
       </p>
     </AuthShell>
   );
@@ -145,22 +141,29 @@ export function AuthShell({ children }) {
         <div className="relative z-10 p-12 flex flex-col justify-between text-white">
           <Link to="/"><Logo light /></Link>
           <div>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur text-xs font-semibold mb-4">
+              🎓 Student Engineering Project
+            </div>
             <h2 className="text-4xl font-bold leading-tight text-gradient-light">
-              The intelligent home for all your files.
+              Cloud Storage & Systems Architecture
             </h2>
-            <p className="mt-4 text-white/80 max-w-md">
-              AI-powered search, OCR, duplicate detection and smart organization — built into a cloud storage experience your team will love.
+            <p className="mt-4 text-white/80 max-w-md text-sm leading-relaxed">
+              Engineered with Spring Boot 3, PostgreSQL (Neon), MinIO distributed S3 storage, and stateless JWT authentication to explore production-grade cloud architectures.
             </p>
-            <div className="mt-8 grid grid-cols-3 gap-4 max-w-md">
-              {[['1,284', 'Docs processed'], ['942', 'OCR runs'], ['99.9%', 'Uptime']].map(([v, l]) => (
-                <div key={l} className="rounded-2xl bg-white/10 backdrop-blur p-4 border border-white/15">
-                  <div className="text-2xl font-bold">{v}</div>
-                  <div className="text-xs text-white/70 mt-0.5">{l}</div>
+            <div className="mt-8 grid grid-cols-3 gap-3 max-w-md">
+              {[
+                ['Spring Boot', 'Java 21 REST'],
+                ['MinIO S3', 'Object Storage'],
+                ['Neon PG', 'PostgreSQL DB'],
+              ].map(([v, l]) => (
+                <div key={l} className="rounded-2xl bg-white/10 backdrop-blur p-3.5 border border-white/15">
+                  <div className="text-base font-bold truncate">{v}</div>
+                  <div className="text-[11px] text-white/70 mt-0.5">{l}</div>
                 </div>
               ))}
             </div>
           </div>
-          <p className="text-xs text-white/60">© 2026 DriveAI, Inc.</p>
+          <p className="text-xs text-white/60 font-mono">© 2026 DriveAI · Open-Source Portfolio Project</p>
         </div>
       </div>
 

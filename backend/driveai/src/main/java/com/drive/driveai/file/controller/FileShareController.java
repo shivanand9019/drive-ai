@@ -3,6 +3,7 @@ package com.drive.driveai.file.controller;
 import com.drive.driveai.file.dto.FileResponse;
 import com.drive.driveai.file.service.FileShareService;
 import com.drive.driveai.security.CustomUserDetails;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,6 +17,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/files/share")
 @RequiredArgsConstructor
+
 public class FileShareController {
 
     private final FileShareService fileShareService;

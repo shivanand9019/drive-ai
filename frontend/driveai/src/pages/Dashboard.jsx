@@ -10,7 +10,6 @@ import {
   ArrowRight,
 } from 'lucide-react';
 
-import StorageCard from '@/components/StorageCard';
 import StatsCard from '@/components/StatsCard';
 import AIInsightsCard from '@/components/AIInsightsCard';
 import FileTable from '@/components/FileTable';
@@ -21,6 +20,7 @@ import Badge from '@/components/Badge';
 import Button from '@/components/Button';
 
 import { fileService } from '@/services/fileService';
+import { dashboardService } from '@/services/dashboardService';
 
 
 const QUICK_ACTIONS = [
@@ -36,22 +36,46 @@ export default function Dashboard() {
   const [files, setFiles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [confirmDelete, setConfirmDelete] = useState(null);
+  const [stats, setStats] = useState({
+    totalFiles: 0,
+    filesUploadedThisMonth: 0,
+    aiProcessedFiles: 0,
+    duplicateFiles: 0,
+  });
 
   const loadFiles = async () => {
     try {
       const response = await fileService.getFiles();
-      console.log("Files API Response:",response);
-      setFiles(Array.isArray(response) ? response : []);
+      // Handle Spring Data Page object response ({ content: [...] }) or direct Array
+      const fileList = Array.isArray(response) ? response : (response?.content || []);
+      setFiles(fileList);
     } catch (error) {
-      console.error(error);
+      console.error("Failed to load files:", error);
       setFiles([]);
     } finally {
       setLoading(false);
     }
   };
 
+  const loadDashboardStats = async () => {
+    try {
+      const data = await dashboardService.getDashboardData();
+      if (data) {
+        setStats({
+          totalFiles: data.totalFiles ?? 0,
+          filesUploadedThisMonth: data.filesUploadedThisMonth ?? 0,
+          aiProcessedFiles: data.aiProcessedFiles ?? 0,
+          duplicateFiles: data.duplicateFiles ?? 0,
+        });
+      }
+    } catch (error) {
+      console.error("Failed to load dashboard stats:", error);
+    }
+  };
+
   useEffect(() => {
     loadFiles();
+    loadDashboardStats();
   }, []);
 
   const handleAction = async (action, file) => {
@@ -163,47 +187,37 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Storage */}
-        <div className="grid lg:grid-cols-3 gap-6">
+        {/* Overview Stats */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
 
-          <StorageCard
-              used={user?.storageUsed ?? 0}
-              limit={user?.storageLimit ?? 100}
-              filesCount={files.length}
+          <StatsCard
+              label="Total Files"
+              value={stats.totalFiles || files.length}
+              icon={FileText}
+              accent="primary"
           />
 
-          <div className="lg:col-span-2 grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <StatsCard
+              label="AI Processed"
+              value={stats.aiProcessedFiles}
+              icon={Sparkles}
+              accent="secondary"
+          />
 
-            <StatsCard
-                label="Total Files"
-                value={files.length}
-                icon={FileText}
-                accent="primary"
-            />
+          <StatsCard
+              label="Duplicates"
+              value={stats.duplicateFiles}
+              icon={TrendingUp}
+              accent="rose"
+          />
 
-            <StatsCard
-                label="AI Processed"
-                value="0"
-                icon={Sparkles}
-                accent="secondary"
-            />
-
-            <StatsCard
-                label="Duplicates"
-                value="0"
-                icon={TrendingUp}
-                accent="rose"
-            />
-
-            <StatsCard
-                label="This Month"
-                value="0"
-                icon={Clock}
-                accent="emerald"
-                sublabel="Files uploaded"
-            />
-
-          </div>
+          <StatsCard
+              label="This Month"
+              value={stats.filesUploadedThisMonth}
+              icon={Clock}
+              accent="emerald"
+              sublabel="Files uploaded"
+          />
 
         </div>
 
@@ -259,7 +273,7 @@ export default function Dashboard() {
 
           </div>
 
-          <AIInsightsCard />
+          <AIInsightsCard stats={stats} />
 
         </div>
 
@@ -277,6 +291,7 @@ export default function Dashboard() {
                 variant="ghost"
                 size="sm"
                 rightIcon={ArrowRight}
+                
             >
               View All
             </Button>

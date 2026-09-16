@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
+@io.swagger.v3.oas.annotations.security.SecurityRequirements()
 //@CrossOrigin("http://localhost:5173/*")
 public class AuthController {
 

@@ -7,8 +7,9 @@ import { useTheme } from '@/context/ThemeContext';
 
 const NAV_LINKS = [
   { label: 'Home', href: '/' },
-  { label: 'Features', href: '/#features' },
-  { label: 'Pricing', href: '/#pricing' },
+  { label: 'Features & Roadmap', href: '/#features' },
+  { label: 'Architecture', href: '/#demo' },
+  { label: 'Open Source & Hosting', href: '/#pricing' },
   { label: 'About', href: '/#about' },
   { label: 'Contact', href: '/#contact' },
 ];
