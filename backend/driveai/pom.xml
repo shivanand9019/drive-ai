@@ -130,8 +130,21 @@
     <groupId>io.minio</groupId>
     <artifactId>minio</artifactId>
     <version>8.5.17</version>
+
+	</dependency>
+		<dependency>
+    <groupId>org.springdoc</groupId>
+    <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+    <version>3.1.1</version>
 </dependency>
+		<dependency>
+    <groupId>me.paulschwarz</groupId>
+    <artifactId>spring-dotenv</artifactId>
+    <version>4.0.0</version>
+	</dependency>
 	</dependencies>
+	
+
 	<dependencyManagement>
 		<dependencies>
 			<dependency>

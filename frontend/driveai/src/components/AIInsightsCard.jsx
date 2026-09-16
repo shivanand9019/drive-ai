@@ -12,7 +12,63 @@ const METRICS = [
   { label: 'Avg Processing Time', value: '1.4s', icon: Zap, accent: 'amber', delta: '-0.3s', sub: 'Per file' },
 ];
 
-export default function AIInsightsCard() {
+export default function AIInsightsCard({ stats = {} }) {
+  // Metrics mapped to backend API where available; un-implemented backend endpoints default to 0 with comments
+  const METRICS = [
+    {
+      label: 'Documents Processed',
+      value: stats?.aiProcessedFiles ?? 0,
+      icon: Sparkles,
+      accent: 'primary',
+      delta: stats?.aiProcessedFiles > 0 ? `+${stats.aiProcessedFiles}` : '0',
+      sub: 'All time processed',
+    },
+    {
+      label: 'Duplicates Found',
+      value: stats?.duplicateFiles ?? 0,
+      icon: TrendingUp,
+      accent: 'rose',
+      delta: stats?.duplicateFiles > 0 ? `+${stats.duplicateFiles}` : '0',
+      sub: 'Auto-detected',
+    },
+    {
+      label: 'OCR Completed',
+      // Backend API for OCR processing is not implemented yet - defaulting to 0
+      value: 0,
+      icon: ScanText,
+      accent: 'secondary',
+      delta: '0',
+      sub: 'Pending OCR pipeline',
+    },
+    {
+      label: 'Images Classified',
+      // Backend API for Image classification is not implemented yet - defaulting to 0
+      value: 0,
+      icon: ImageIcon,
+      accent: 'violet',
+      delta: '0',
+      sub: 'Pending vision AI',
+    },
+    {
+      label: 'Documents Summarized',
+      // Backend API for Document summarization is not implemented yet - defaulting to 0
+      value: 0,
+      icon: FileText,
+      accent: 'emerald',
+      delta: '0',
+      sub: 'Pending Gemini pipeline',
+    },
+    {
+      label: 'Avg Processing Time',
+      // Backend API for average processing time tracking is not implemented yet - defaulting to 0s
+      value: '0s',
+      icon: Zap,
+      accent: 'amber',
+      delta: '0s',
+      sub: 'Per file',
+    },
+  ];
+
   return (
     <div className="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-soft overflow-hidden">
       <div className="p-5 flex items-center justify-between border-b border-slate-100 dark:border-slate-800">
@@ -50,7 +106,7 @@ export default function AIInsightsCard() {
       <div className="px-5 py-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50/50 dark:bg-slate-800/20">
         <div className="flex items-center gap-2 text-xs text-slate-500">
           <Clock className="h-3.5 w-3.5" />
-          Last AI scan: <span className="font-medium text-slate-700 dark:text-slate-300">2 min ago</span>
+          Last AI scan: <span className="font-medium text-slate-700 dark:text-slate-300">{stats?.aiProcessedFiles > 0 ? 'Recently active' : 'No scans yet'}</span>
         </div>
         <div className="flex items-center gap-2">
           <ShieldCheck className="h-3.5 w-3.5 text-emerald-500" />

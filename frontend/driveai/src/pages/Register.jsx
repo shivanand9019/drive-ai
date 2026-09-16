@@ -77,20 +77,26 @@ export default function Register() {
     <AuthShell>
       <div className="text-center">
         <Link to="/" className="inline-block"><Logo /></Link>
-        <h1 className="mt-6 text-2xl font-bold text-slate-900 dark:text-white">Create your account</h1>
-        <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">Start using AI-powered cloud storage today</p>
+        <h1 className="mt-6 text-2xl font-bold text-slate-900 dark:text-white">Create an account</h1>
+        <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">Sign up to get started with DriveAI</p>
       </div>
+
+      {serverErrors && typeof serverErrors === 'string' && (
+        <div className="mt-4 p-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 text-xs text-rose-600 dark:text-rose-400 text-center font-medium">
+          {serverErrors}
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} className="mt-8 space-y-5">
         <Field
           label="Full Name"
           icon={User}
-          error={errors.name}
+          error={errors.fullName}
           inputProps={{
-              name:"fullName",
+            name: "fullName",
             placeholder: 'Alex Morgan',
             value: form.fullName,
-            onChange:handleChange
+            onChange: handleChange
           }}
         />
         <Field
@@ -98,11 +104,11 @@ export default function Register() {
           icon={Mail}
           error={errors.email}
           inputProps={{
-              name:"email",
+            name: "email",
             type: 'email',
-            placeholder: 'you@company.com',
+            placeholder: 'you@example.com',
             value: form.email,
-            onChange:handleChange
+            onChange: handleChange
           }}
         />
         <div>
@@ -116,11 +122,11 @@ export default function Register() {
               </button>
             }
             inputProps={{
-                name:"password",
+              name: "password",
               type: showPassword ? 'text' : 'password',
               placeholder: '••••••••',
               value: form.password,
-              onChange:handleChange
+              onChange: handleChange
             }}
           />
           {form.password && (
@@ -145,8 +151,8 @@ export default function Register() {
           icon={Lock}
           error={errors.confirm}
           inputProps={{
-              name:"confirm",
-            type:showPassword ? 'text' : 'password',
+            name: "confirm",
+            type: showPassword ? 'text' : 'password',
             placeholder: '••••••••',
             value: form.confirm,
             onChange: handleChange
@@ -156,7 +162,7 @@ export default function Register() {
         <div>
           <label className="flex items-start gap-2.5 text-sm text-slate-600 dark:text-slate-300 cursor-pointer select-none">
             <Checkbox checked={form.terms} onChange={(v) => setForm({ ...form, terms: v })} />
-            <span>I agree to the <a href="#" className="text-primary-600 dark:text-primary-400 font-medium hover:underline">Terms</a> and <a href="#" className="text-primary-600 dark:text-primary-400 font-medium hover:underline">Privacy Policy</a>.</span>
+            <span className="text-xs">I agree to the Terms of Service and Privacy Policy</span>
           </label>
           {errors.terms && <p className="mt-1.5 text-xs text-rose-600">{errors.terms}</p>}
         </div>
@@ -166,7 +172,7 @@ export default function Register() {
         </Button>
       </form>
 
-      <p className="mt-8 text-center text-sm text-slate-500 dark:text-slate-400">
+      <p className="mt-6 text-center text-sm text-slate-500 dark:text-slate-400">
         Already have an account?{' '}
         <Link to="/login" className="font-semibold text-primary-600 dark:text-primary-400 hover:underline">Sign in</Link>
       </p>
